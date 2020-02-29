@@ -1,0 +1,158 @@
+/*Main color: */
+:root {
+    --main-color: #292f33;
+    --secondary-color: #86959b;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    padding: 0;
+    margin: 0;
+    overflow : hidden;
+    background-color: var(--main-color);
+}
+
+#info, h1 {
+    text-align: center;
+}
+
+#size {
+    padding-top: 10px;
+    font-weight: bold;
+}
+
+#difficulty {
+    font-weight: bold;
+    margin-top: 10px;
+}
+.container {
+    font-weight: normal;
+    display: block;
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default radio button */
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.container input:checked ~ .checkmark {
+    font-weight: bold;
+}
+
+.container input:checked ~ .container{
+    background-color: #04B1B1;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+#info {
+    background: #726A75;
+    border-style: outset;
+    border-color: #A095A6 #4A454D #4A454D #A095A6;
+    opacity: 90%;
+    display: none;
+    position: absolute;
+    padding: 1%;
+    top: 10%;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+    outline : none;
+    border: 0;
+}
+
+#title {
+    font-family: 'Fira Sans', sans-serif;
+    color: black;
+
+    white-space: nowrap;
+    cursor: pointer;
+    display: table;
+
+    margin: auto;
+    width: 60%;
+    /*border: 3px solid #73AD21;*/
+    padding: 1%;
+
+    text-align: center;
+
+    text-decoration: none;
+}
+
+#title h1 {
+    font-size: 6em;
+}
+
+h1 {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    text-shadow: inherit;
+}
+
+#restart {
+    margin-top: 10px;
+}
+
+#floater {
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    top: 5%     ;
+    left: 0;
+    right: 0;
+}
+
+.items {
+    font-family: 'Fira Sans', sans-serif;
+    color: white;
+    text-shadow: 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
+    white-space: nowrap;
+
+    display: table;
+    font-size: 2.7em;
+    margin: auto;
+    /*border: 3px solid #73AD21;*/
+    padding: 1%;
+
+    text-align: center;
+
+    text-decoration: none;
+}
+
+#colorChanging {
+    display: inline;
+}
