@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+    <title>s4muel</title>
+    <script src="../p5/p5.dom.js"></script>
+    <script src="../p5/p5.sound.js"></script>
+    <script src="../p5/p5.js"></script>
+</head>
+<div id="FragmentShader" style="display: none;">
+    #ifdef GL_FRAGEMENT_PRECISION_HIGH
+    precision highp float;
+    #else
+    precision mediump float;
+    #endif
+    precision mediump int;
+
+    #define MAX_ITERATIONS 2000
+    #define XMIN -5.5
+    #define YMIN -4.0
+    #define WH 4.0
+
+    void main() {
+        // Normalized pixel position to complex plane position
+
+<!--    float maxPwh = max(1920.0, 1080.0);-->
+<!--    float x = XMIN+(gl_FragCoord.x/WH)*maxPwh;-->
+<!--    float y = YMIN+(gl_FragCoord.y/WH)*maxPwh;-->
+
+        float maxPwh = max(640.0, 480.0);
+        float x = XMIN+(gl_FragCoord.x/maxPwh)*WH;
+        float y = YMIN+(gl_FragCoord.y/maxPwh)*WH;
+
+        // Complex plane window offsets for pixel windows that are not square
+        float halfDelta = WH/maxPwh*0.5;
+        x -= min((640.0-480.0)*halfDelta, 0.0);
+        y -= min((480.0-640.0)*halfDelta, 0.0);
+
+        // Mandelbrot Set code
+        float zr = x;
+        float zi = y;
+        int iterations = 0;
+        for (int i = 0; i < MAX_ITERATIONS; i++) {
+            iterations = i;
+
+            float sqZr = zr*zr;
+            float sqZi = zi*zi;
+            float twoZri = 2.0*zr*zi;
+            zr = sqZr-sqZi+x;
+            zi = twoZri+y;
+
+            if (sqZr+sqZi > 16.0) break;
+        }
+
+        float color = 1.0;
+        float iter = float(iterations)*20.0;
+        float maxIter = float(MAX_ITERATIONS);
+
+        if (iterations != MAX_ITERATIONS-1) {
+            color = iter/maxIter;
+        }
+
+        gl_FragColor = vec4(vec3(color), 1.0);
+    }
+
+</div>
+<div id="VertexShader" style="display: none">
+
+
+    attribute vec2 position;
+
+    void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+    }
+
+
+</div>
+<body>
+<canvas id="glCanvas">
+    <script src="mandelbrot.js"></script>
+</canvas>
+</body>
+</html>
