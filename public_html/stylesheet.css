@@ -4,6 +4,16 @@
     --secondary-color: #86959b;
 }
 
+@font-face {
+    font-family: 'Raleway';
+    src:url('Fonts/Raleway/Raleway.ttf.woff') format('woff'),
+    url('Fonts/Raleway/Raleway.ttf.svg#Raleway') format('svg'),
+    url('Fonts/Raleway/Raleway.ttf.eot'),
+    url('Fonts/Raleway/Raleway.ttf.eot?#iefix') format('embedded-opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     padding: 0;
@@ -95,7 +105,7 @@ body {
 }
 
 #title {
-    font-family: 'Fira Sans', sans-serif;
+    font-family: 'Raleway', sans-serif;
     color: black;
 
     white-space: nowrap;
@@ -104,16 +114,14 @@ body {
 
     margin: auto;
     width: 60%;
-    /*border: 3px solid #73AD21;*/
-    padding: 1%;
 
+    padding: 3% 1% 5%;
     text-align: center;
-
     text-decoration: none;
 }
 
 #title h1 {
-    font-size: 6em;
+    font-size: 4em;
 }
 
 h1 {
@@ -137,7 +145,7 @@ h1 {
 }
 
 .items {
-    font-family: 'Fira Sans', sans-serif;
+    font-family: 'Raleway', sans-serif;
     color: white;
     text-shadow: 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
     white-space: nowrap;
