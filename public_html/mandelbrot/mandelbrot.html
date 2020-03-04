@@ -10,60 +10,67 @@
     <script src="../p5/p5.sound.js"></script>
     <script src="../p5/p5.js"></script>
 </head>
-<div id="FragmentShader" style="display: none;">
-    #ifdef GL_FRAGEMENT_PRECISION_HIGH
+<div id="FragmentShader" style="display: none;">#ifdef GL_FRAGEMENT_PRECISION_HIGH
     precision highp float;
     #else
     precision mediump float;
     #endif
     precision mediump int;
 
-    #define MAX_ITERATIONS 2000
+    uniform float zoom;
+    uniform int maxIters;
+
+    uniform float minViewportX;
+    uniform float minViewportY;
+
+    uniform float viewportWidth;
+    uniform float viewportHeight;
+
+    uniform float width;
+    uniform float height;
+    uniform int ITERS;
+
+    #define MAX_ITERATIONS 3000
     #define XMIN -5.5
-    #define YMIN -4.0
-    #define WH 4.0
+    #define YMIN -3.0
+    #define WH 4.0 * zoom
 
     void main() {
-        // Normalized pixel position to complex plane position
+    // Normalized pixel position to complex plane position
+    float maxPwh = max(640.0, 480.0);
+    float x = minViewportX+(gl_FragCoord.x/height)*viewportWidth;
+    float y = minViewportY+(gl_FragCoord.y/height)*viewportHeight;
 
-<!--    float maxPwh = max(1920.0, 1080.0);-->
-<!--    float x = XMIN+(gl_FragCoord.x/WH)*maxPwh;-->
-<!--    float y = YMIN+(gl_FragCoord.y/WH)*maxPwh;-->
+    // Complex plane window offsets for pixel windows that are not square
+    float halfDelta = WH/maxPwh*0.5;
+    x -= min((640.0-480.0)*halfDelta, 0.0);
+    y -= min((480.0-640.0)*halfDelta, 0.0);
 
-        float maxPwh = max(640.0, 480.0);
-        float x = XMIN+(gl_FragCoord.x/maxPwh)*WH;
-        float y = YMIN+(gl_FragCoord.y/maxPwh)*WH;
+    // Mandelbrot Set code
+    float zr = x;
+    float zi = y;
+    int iterations = 0;
+    for (int i = 0; i < MAX_ITERATIONS; i++) {
+    iterations = i;
 
-        // Complex plane window offsets for pixel windows that are not square
-        float halfDelta = WH/maxPwh*0.5;
-        x -= min((640.0-480.0)*halfDelta, 0.0);
-        y -= min((480.0-640.0)*halfDelta, 0.0);
+    float sqZr = zr*zr;
+    float sqZi = zi*zi;
+    float twoZri = 2.0*zr*zi;
+    zr = sqZr-sqZi+x;
+    zi = twoZri+y;
 
-        // Mandelbrot Set code
-        float zr = x;
-        float zi = y;
-        int iterations = 0;
-        for (int i = 0; i < MAX_ITERATIONS; i++) {
-            iterations = i;
+    if (sqZr+sqZi > 16.0) break;
+    }
 
-            float sqZr = zr*zr;
-            float sqZi = zi*zi;
-            float twoZri = 2.0*zr*zi;
-            zr = sqZr-sqZi+x;
-            zi = twoZri+y;
+    float color = 1.0;
+    float iter = float(iterations)*20.0;
+    float maxIter = float(MAX_ITERATIONS);
 
-            if (sqZr+sqZi > 16.0) break;
-        }
+    if (iterations != MAX_ITERATIONS-1) {
+    color = iter/maxIter;
+    }
 
-        float color = 1.0;
-        float iter = float(iterations)*20.0;
-        float maxIter = float(MAX_ITERATIONS);
-
-        if (iterations != MAX_ITERATIONS-1) {
-            color = iter/maxIter;
-        }
-
-        gl_FragColor = vec4(vec3(color), 1.0);
+    gl_FragColor = vec4(vec3(color), 1.0);
     }
 
 </div>

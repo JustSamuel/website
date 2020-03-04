@@ -1,41 +1,61 @@
-#ifdef GL_ES
+#ifdef GL_FRAGEMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
 #endif
+precision mediump int;
 
-#extension GL_OES_standard_derivatives : enable
+uniform float zoom;
+uniform int maxIters;
 
-uniform float time;
-uniform vec2 mouse;
-uniform vec2 resolution;
-varying vec2 surfacePosition;
+uniform float minViewportX;
+uniform float minViewportY;
 
-float checkIfBelongsToMandelbrotSet(vec2 p) {
-    float realComponentOfResult = p.x;
-    float imaginaryComponentOfResult = p.y;
-    const float maxIterations = 100.0;
-    for(float i = 0.0; i < maxIterations; i+= 1.0) {
-        float tempRealComponent = realComponentOfResult * realComponentOfResult
-        - imaginaryComponentOfResult * imaginaryComponentOfResult
-        + p.x;
-        float tempImaginaryComponent = 2.0 * realComponentOfResult * imaginaryComponentOfResult
-        + p.y;
-        realComponentOfResult = tempRealComponent;
-        imaginaryComponentOfResult = tempImaginaryComponent;
+uniform float viewportWidth;
+uniform float viewportHeight;
 
-        if(realComponentOfResult * imaginaryComponentOfResult > 5.0)
-        return (i / maxIterations);
+uniform float width;
+uniform float height;
+
+#define MAX_ITERATIONS 2000
+#define XMIN -5.5
+#define YMIN -3.0
+#define WH 4.0 * zoom
+
+void main() {
+    // Normalized pixel position to complex plane position
+    float maxPwh = max(640.0, 480.0);
+    float x = minViewportX+(gl_FragCoord.x/width)*viewportWidth;
+    float y = minViewportY+(gl_FragCoord.y/height)*viewportWidth;
+
+    // Complex plane window offsets for pixel windows that are not square
+    float halfDelta = WH/maxPwh*0.5;
+    x -= min((640.0-480.0)*halfDelta, 0.0);
+    y -= min((480.0-640.0)*halfDelta, 0.0);
+
+    // Mandelbrot Set code
+    float zr = x;
+    float zi = y;
+    int iterations = 0;
+    for (int i = 0; i < MAX_ITERATIONS; i++) {
+        iterations = i;
+
+        float sqZr = zr*zr;
+        float sqZi = zi*zi;
+        float twoZri = 2.0*zr*zi;
+        zr = sqZr-sqZi+x;
+        zi = twoZri+y;
+
+        if (sqZr+sqZi > 16.0) break;
     }
-    return 0.0;   // Return zero if in set
-}
 
+    float color = 1.0;
+    float iter = float(iterations)*20.0;
+    float maxIter = float(MAX_ITERATIONS);
 
+    if (iterations != MAX_ITERATIONS-1) {
+        color = iter/maxIter;
+    }
 
-void main( void ) {
-    vec2 p = surfacePosition;
-    p -= 0.5;
-
-    float color = checkIfBelongsToMandelbrotSet(p);
     gl_FragColor = vec4(vec3(color), 1.0);
 }
-
-

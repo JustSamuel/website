@@ -3,10 +3,18 @@ var mandelbrot = function () {
     this.gl = undefined;
     this.shaderProgram = undefined;
 
+    this.oldX =undefined;
+    this.oldY =undefined;
+
     this.init = function () {
+        console.log("INIT");
         this.canvas = document.getElementById("glCanvas");
         this.canvas.width = innerWidth;
         this.canvas.height = innerHeight;
+        this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this), false);
+        this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this), false);
+        this.canvas.addEventListener("mousemove", this.onMouseDrag.bind(this), false);
+        this.canvas.addEventListener("wheel", this.zoom.bind(this), false);
 
         this.gl = this.initGl(this.canvas);
         if (!this.gl) {
@@ -41,11 +49,48 @@ var mandelbrot = function () {
         this.gl.enableVertexAttribArray(this.position);
         this.gl.vertexAttribPointer(this.position, 2, this.gl.FLOAT, false, 0, 0);
 
+        this.zoomLocation = this.gl.getUniformLocation(this.shaderProgram, "zoom");
+        this.gl.uniform1f(this.zoomLocation, this.zoom);
+
+        // let minViewportX = -2.135;
+        // let minViewportY = -1.475;
+        // let viewportWidth = 4;
+        // let viewportHeight = 4;
+        //
+        this.minViewportXLocation = this.gl.getUniformLocation(this.shaderProgram, "minViewportX");
+        this.gl.uniform1f(this.minViewportXLocation, minViewportX);
+
+        this.minViewportYLocation = this.gl.getUniformLocation(this.shaderProgram, "minViewportY");
+        this.gl.uniform1f(this.minViewportYLocation, minViewportY);
+
+        this.viewportWidthLocation = this.gl.getUniformLocation(this.shaderProgram, "viewportWidth");
+        this.gl.uniform1f(this.viewportWidthLocation, viewportWidth);
+
+        this.viewportHeightLocation = this.gl.getUniformLocation(this.shaderProgram, "viewportHeight");
+        this.gl.uniform1f(this.viewportHeightLocation, viewportHeight);
+
+        this.widthLocation = this.gl.getUniformLocation(this.shaderProgram, "width");
+        this.gl.uniform1f(this.widthLocation, this.canvas.width);
+
+        this.heightLocation = this.gl.getUniformLocation(this.shaderProgram, "height");
+        this.gl.uniform1f(this.heightLocation, this.canvas.height);
+
+        this.iterationsLocation = this.gl.getUniformLocation(this.shaderProgram, "ITERS");
+        this.gl.uniform1i(this.iterationsLocation, iterations);
+
         this.draw();
     };
 
     this.draw = function () {
         window.requestAnimationFrame(this.draw.bind(this));
+
+        this.gl.uniform1f(this.minViewportXLocation, minViewportX);
+        this.gl.uniform1f(this.minViewportYLocation, minViewportY);
+        this.gl.uniform1f(this.viewportWidthLocation, viewportWidth);
+        this.gl.uniform1f(this.viewportHeightLocation, viewportHeight);
+        this.gl.uniform1f(this.widthLocation, this.canvas.width);
+        this.gl.uniform1f(this.heightLocation, this.canvas.height);
+        this.gl.uniform1i(this.iterationsLocation, iterations);
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
@@ -91,8 +136,68 @@ var mandelbrot = function () {
         this.gl.useProgram(this.shaderProgram);
 
         return this.shaderProgram;
-    }
+    };
+
+    this.deltaX = undefined;
+    this.deltaY = undefined;
+
+    this.mousedown = false;
+    this.onMouseDown = function (e) {
+        this.oldX = e.offsetX;
+        this.oldY = e.offsetY;
+        this.mousedown = true;
+    };
+
+    this.onMouseUp = function (e) {
+        this.mousedown = false;
+    };
+
+    this.onMouseDrag = function (e) {
+        if (this.mousedown) {
+
+            if (this.oldX == undefined || 0) {
+                this.oldX = e.offsetX;
+                this.oldY = e.offsetY;
+            }
+
+            let deltaX = e.offsetX - this.oldX;
+            let deltaY = e.offsetY - this.oldY;
+
+            this.oldX = e.offsetX;
+            this.oldY = e.offsetY;
+
+            console.log("move");
+            minViewportX -= (deltaX*2 / this.canvas.width) * viewportWidth;
+            minViewportY += (deltaY / this.canvas.height) * viewportHeight;
+
+            // console.log(deltaX, deltaY);
+        }
+    };
+
+    this.zoom = function (e) {
+        let delta = e.deltaY;
+        console.log(delta);
+        if (delta > 0) {
+            viewportWidth = viewportWidth / ZOOM_FACTOR;
+            viewportHeight = viewportHeight / ZOOM_FACTOR;
+            iterations += 100;
+        } else {
+            viewportWidth = viewportWidth * ZOOM_FACTOR;
+            viewportHeight = viewportHeight * ZOOM_FACTOR;
+            iterations -= 100;
+        }
+    };
+
 };
+
+let ZOOM_FACTOR = 2;
+let zoom = 1;
+let DRAG_TRESHHOLD = 5;
+let minViewportX = -2.135;
+let minViewportY = -1.475;
+let viewportWidth = 4;
+let viewportHeight = 4;
+let iterations = 2000;
 
 var sketch = new mandelbrot();
 sketch.init();
