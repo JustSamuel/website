@@ -11,6 +11,6 @@ jobs:
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@3.0.0
       with:
-        ftp-server: ftp://185.182.56.163
+        ftp-server: ftp://185.182.56.163/domains/s4muel.eu
         ftp-username: ronooot145
         ftp-password: ${{ secrets.FTP_PASSWORD }}
