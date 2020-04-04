@@ -160,7 +160,7 @@ var mandelbrot = function () {
 
     this.onMouseDrag = function (e) {
         if (this.mousedown) {
-            if (this.oldX == undefined || 0) {
+            if (this.oldX === undefined || 0) {
                 this.oldX = e.offsetX;
                 this.oldY = e.offsetY;
             }
