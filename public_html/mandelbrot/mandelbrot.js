@@ -11,10 +11,16 @@ var mandelbrot = function () {
         this.canvas = document.getElementById("glCanvas");
         this.canvas.width = innerWidth;
         this.canvas.height = innerHeight;
+
+        // Center the set.
+        minViewportX = (((4*innerWidth)/innerHeight)/2 + 0.5) * -1;
+
+
         this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this), false);
         this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this), false);
         this.canvas.addEventListener("mousemove", this.onMouseDrag.bind(this), false);
         this.canvas.addEventListener("wheel", this.zoom.bind(this), false);
+        window.addEventListener("resize", this.init.bind(this), false);
 
         this.gl = this.initGl(this.canvas);
         if (!this.gl) {
@@ -154,7 +160,6 @@ var mandelbrot = function () {
 
     this.onMouseDrag = function (e) {
         if (this.mousedown) {
-
             if (this.oldX == undefined || 0) {
                 this.oldX = e.offsetX;
                 this.oldY = e.offsetY;
@@ -169,32 +174,43 @@ var mandelbrot = function () {
             console.log("move");
             minViewportX -= (deltaX*2 / this.canvas.width) * viewportWidth;
             minViewportY += (deltaY / this.canvas.height) * viewportHeight;
-
-            // console.log(deltaX, deltaY);
         }
     };
 
     this.zoom = function (e) {
         let delta = e.deltaY;
-        console.log(delta);
+
+        let mouseX = (minViewportX + (viewportHeight*e.offsetX)/innerHeight);
+        let deltaX;
+        let mouseY = minViewportY + ((viewportHeight*-1*(e.offsetY-innerHeight))/innerHeight);
+        let deltaY;
+
         if (delta > 0) {
             viewportWidth = viewportWidth / ZOOM_FACTOR;
             viewportHeight = viewportHeight / ZOOM_FACTOR;
-            iterations += 100;
+
+            deltaX = (mouseX - minViewportX) * (1-(1/ZOOM_FACTOR));
+            deltaY = (mouseY - minViewportY) * (1-(1/ZOOM_FACTOR));
+
         } else {
             viewportWidth = viewportWidth * ZOOM_FACTOR;
             viewportHeight = viewportHeight * ZOOM_FACTOR;
-            iterations -= 100;
-        }
-    };
 
+            deltaX = (mouseX - minViewportX) * (1-ZOOM_FACTOR);
+            deltaY = (mouseY - minViewportY) * (1-ZOOM_FACTOR);
+        }
+
+        minViewportY += deltaY;
+        minViewportX += deltaX;
+
+    };
 };
 
 let ZOOM_FACTOR = 2;
 let zoom = 1;
 let DRAG_TRESHHOLD = 5;
-let minViewportX = -2.135;
-let minViewportY = -1.475;
+let minViewportX = -4.05;
+let minViewportY = -2;
 let viewportWidth = 4;
 let viewportHeight = 4;
 let iterations = 2000;
