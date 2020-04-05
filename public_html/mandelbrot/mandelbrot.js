@@ -17,13 +17,17 @@ var mandelbrot = function () {
     // All uniform variables used in the mandelbrot.
     this.data = {
         minViewportX: (function () {
-            return minViewportX;}),
+            return minViewportX;
+        }),
         minViewportY: (function () {
-            return minViewportY;}),
+            return minViewportY;
+        }),
         viewportWidth: (function () {
-            return viewportWidth;}),
+            return viewportWidth;
+        }),
         viewportHeight: (function () {
-            return viewportHeight;}),
+            return viewportHeight;
+        }),
     };
 
     // Uniform locations of the variables.
@@ -57,7 +61,7 @@ var mandelbrot = function () {
         // Initial draw.
         if (minViewportX === INITIAL_VIEWPORT_X) {
             // Center the set.
-            minViewportX = (((4*innerWidth)/innerHeight)/2 + 0.5) * -1;
+            minViewportX = (((4 * innerWidth) / innerHeight) / 2 + 0.5) * -1;
         }
 
         this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this), false);
@@ -74,7 +78,7 @@ var mandelbrot = function () {
         }
 
         // Set viewport according to canvas size
-        this.gl.viewport( 0, 0, this.canvas.width, this.canvas.height );
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
         // Create the shader program.
         this.shaderProgram = this.initShaders();
@@ -167,7 +171,7 @@ var mandelbrot = function () {
      * Initializes the shader from the data in the mandelbrot.html
      * @returns {boolean|*} returns shader on success and false on failure.
      */
-    this.initShaders = function() {
+    this.initShaders = function () {
         // Get vertex shader from the html.
         this.vertexShader = this.gl.createShader(this.gl.VERTEX_SHADER);
         this.gl.shaderSource(this.vertexShader, document.getElementById("VertexShader").innerText);
@@ -206,8 +210,8 @@ var mandelbrot = function () {
     // Used for dragging the mandelbrot.
     this.deltaX = undefined;
     this.deltaY = undefined;
-    this.oldX =undefined;
-    this.oldY =undefined;
+    this.oldX = undefined;
+    this.oldY = undefined;
     this.mousedown = false;
 
     // Update mouse values on click and enable dragging.
@@ -237,7 +241,7 @@ var mandelbrot = function () {
             this.oldY = e.offsetY;
 
             // Update the uniform values.
-            minViewportX -= (deltaX*2 / this.canvas.width) * viewportWidth;
+            minViewportX -= (deltaX * 2 / this.canvas.width) * viewportWidth;
             minViewportY += (deltaY / this.canvas.height) * viewportHeight;
         }
     };
@@ -264,23 +268,23 @@ var mandelbrot = function () {
         let deltaX;
         let deltaY;
 
-        // Zoom factor based on steps.
-        let zoom = (1 + (ZOOM_FACTOR - 1) / this.zoomSteps);
+        // Zoom factor based on gaussian function.
+        let zoom = 1 + gaussianFunction(this.steps, 0.05, this.zoomSteps / 2, 10);
 
         if (scroll > 0) {
             // Zooming in.
             viewportWidth = viewportWidth / zoom;
             viewportHeight = viewportHeight / zoom;
 
-            deltaX = (mouse.x - minViewportX) * (1-(1/zoom));
-            deltaY = (mouse.y - minViewportY) * (1-(1/zoom));
+            deltaX = (mouse.x - minViewportX) * (1 - (1 / zoom));
+            deltaY = (mouse.y - minViewportY) * (1 - (1 / zoom));
         } else {
             // Zooming out
             viewportWidth = viewportWidth * zoom;
             viewportHeight = viewportHeight * zoom;
 
-            deltaX = (mouse.x - minViewportX) * (1-zoom);
-            deltaY = (mouse.y - minViewportY) * (1-zoom);
+            deltaX = (mouse.x - minViewportX) * (1 - zoom);
+            deltaY = (mouse.y - minViewportY) * (1 - zoom);
         }
 
         // Apply translation
@@ -305,7 +309,7 @@ var mandelbrot = function () {
             return;
         } else if (this.doZoom) {
             // Extra zooming increases zoom.
-            this.steps += (this.zoomSteps/10);
+            this.steps += (this.zoomSteps / 10);
         }
 
         this.storedE = e;
@@ -313,6 +317,14 @@ var mandelbrot = function () {
     };
 
 };
+
+/**
+ * Gaussian function used for zoom smoothing.
+ * @link https://en.wikipedia.org/wiki/Gaussian_function
+ */
+function gaussianFunction(x, a, b, c) {
+    return (a * Math.pow(Math.E, -1 * (Math.pow(x - b, 2) / (2 * Math.pow(c, 2)))));
+}
 
 // Used to determine if it is a fresh initialization.
 const INITIAL_VIEWPORT_X = -4.05;
