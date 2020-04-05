@@ -1,12 +1,15 @@
 /**
- * Namespacing for the main background animation
+ * Name spacing for the main background animation
  * @param p - the name space
  */
 let CelAnimation = function (p) {
 
     let SPEED_FACTOR = 0.7;
     let COLOR_RANGE;
+
+    // Default MAX_CELLS
     let MAX_CELLS = 400;
+
     /**
      * Main p5.js setup
      */
@@ -61,6 +64,7 @@ let CelAnimation = function (p) {
             }
         }
 
+        // Color deviation.
         deviation = 20;
 
         newCell(location, speed, hue, fertility){
@@ -94,10 +98,11 @@ let CelAnimation = function (p) {
         }
 
         update(){
-            this.age -= this.AGING_SPEED * (1 + this.fertility);
+            this.age -= this.AGING_SPEED * (Math.pow(1 + this.fertility,2)) * (this.SPLIT_COUNT+1);
 
             if (this.age <= 0.1) {
                 this.kill();
+                return;
             }
 
             this.move();
@@ -173,7 +178,7 @@ let CelAnimation = function (p) {
 
                 let fert = this.fertility;
                 let friend = new cell(this.location, seperationSpeed, this.hue + 5 - p.random(10),
-                    fert);
+                    fert+fert*(p.random()-0.5)*0.01);
                 this.friends.push(friend);
                 friend.friends.push(this);
                 p.handler.cells.push(friend);
@@ -181,13 +186,15 @@ let CelAnimation = function (p) {
         }
     }
 
+    // Spawn a cell on mouse location.
     p.mousePressed = function () {
         if (p.mouseButton === p.LEFT) {
             let init_speed = p5.Vector.random2D().mult(SPEED_FACTOR);
             p.handler.newCell(p.createVector(p.mouseX, p.mouseY), init_speed, p.random(100), 0.002);
         }
-    }
+    };
 
+    // Common canvas resize.
     p.windowResized = function() {
         p.resizeCanvas(p.windowWidth, p.windowHeight);
     }
