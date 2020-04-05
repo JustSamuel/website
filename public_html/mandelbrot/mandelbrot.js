@@ -10,8 +10,17 @@ var mandelbrot = function () {
     this.oldX =undefined;
     this.oldY =undefined;
 
+    this.data = {
+        "minViewportX": minViewportX,
+        "minViewportY": minViewportY,
+        "viewportWidth": viewportWidth,
+        "viewportHeight": viewportHeight,
+        // "width": this.canvas.width,
+        // "height": this.canvas.height,
+    };
+
     this.storedE = undefined;
-    this.zoomSteps = 200;
+    this.zoomSteps = 50;
     this.steps = this.zoomSteps;
     this.doZoom = false;
 
@@ -62,9 +71,6 @@ var mandelbrot = function () {
         this.position = this.gl.getAttribLocation(this.shaderProgram, "position");
         this.gl.enableVertexAttribArray(this.position);
         this.gl.vertexAttribPointer(this.position, 2, this.gl.FLOAT, false, 0, 0);
-
-        this.zoomLocation = this.gl.getUniformLocation(this.shaderProgram, "zoom");
-        this.gl.uniform1f(this.zoomLocation, this.zoom);
 
         // let minViewportX = -2.135;
         // let minViewportY = -1.475;
@@ -197,20 +203,22 @@ var mandelbrot = function () {
         let mouseY = minViewportY + ((viewportHeight*-1*(this.storedE.offsetY-innerHeight))/innerHeight);
         let deltaY;
 
-        if (delta > 0) {
-            viewportWidth = viewportWidth / (1 + (ZOOM_FACTOR-1)/this.zoomSteps);
-            viewportHeight = viewportHeight / (1 + (ZOOM_FACTOR-1)/this.zoomSteps);
+        let zoom = (1 + (ZOOM_FACTOR - 1) / this.zoomSteps);
 
-            deltaX = (mouseX - minViewportX) * (1-(1/(1 + (ZOOM_FACTOR-1)/this.zoomSteps)));
-            deltaY = (mouseY - minViewportY) * (1-(1/(1 + (ZOOM_FACTOR-1)/this.zoomSteps)));
+        if (delta > 0) {
+            viewportWidth = viewportWidth / zoom;
+            viewportHeight = viewportHeight / zoom;
+
+            deltaX = (mouseX - minViewportX) * (1-(1/zoom));
+            deltaY = (mouseY - minViewportY) * (1-(1/zoom));
             minViewportY += deltaY;
             minViewportX += deltaX;
         } else {
-            viewportWidth = viewportWidth * (1 + (ZOOM_FACTOR-1)/this.zoomSteps);
-            viewportHeight = viewportHeight * (1 + (ZOOM_FACTOR-1)/this.zoomSteps);
+            viewportWidth = viewportWidth * zoom;
+            viewportHeight = viewportHeight * zoom;
 
-            deltaX = (mouseX - minViewportX) * (1-(1 + (ZOOM_FACTOR-1)/this.zoomSteps));
-            deltaY = (mouseY - minViewportY) * (1-(1 + (ZOOM_FACTOR-1)/this.zoomSteps));
+            deltaX = (mouseX - minViewportX) * (1-zoom);
+            deltaY = (mouseY - minViewportY) * (1-zoom);
             minViewportY += deltaY;
             minViewportX += deltaX;
         }
@@ -224,8 +232,7 @@ var mandelbrot = function () {
     };
 
     this.zoom = function (e) {
-        console.log(this.doZoom);
-        console.log("zoom attempt");
+        console.log(viewportWidth);
         if (this.doZoom) return;
         this.storedE = e;
         this.doZoom = true;
@@ -234,7 +241,6 @@ var mandelbrot = function () {
 
 let ZOOM_FACTOR = 2;
 let zoom = 1;
-let DRAG_TRESHHOLD = 5;
 let minViewportX = -4.05;
 let minViewportY = -2;
 let viewportWidth = 4;
