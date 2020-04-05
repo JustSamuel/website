@@ -38,9 +38,10 @@ var mandelbrot = function () {
 
     // Amount of steps.
     this.zoomSteps = 50;
+    this.initialZoomSteps = this.zoomSteps;
 
     // Used to keep track of animation data between refreshes.
-    this.steps = this.zoomSteps;
+    this.steps = 0;
     this.doZoom = false;
 
     // Shader initializer.
@@ -68,6 +69,7 @@ var mandelbrot = function () {
         this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this), false);
         this.canvas.addEventListener("mousemove", this.onMouseDrag.bind(this), false);
         this.canvas.addEventListener("wheel", this.zoom.bind(this), false);
+        this.canvas.addEventListener("dblclick", this.zoom.bind(this), false);
         window.addEventListener("resize", this.init.bind(this), false);
 
         // Initialize GL.
@@ -269,9 +271,9 @@ var mandelbrot = function () {
         let deltaY;
 
         // Zoom factor based on gaussian function.
-        let zoom = 1 + gaussianFunction(this.steps, 0.05, this.zoomSteps / 2, 10);
+        let zoom = 1 + gaussianFunction(this.steps, 0.05, this.zoomSteps / 2, this.zoomSteps / 6);
 
-        if (scroll > 0) {
+        if (scroll > 0 || scroll === undefined) {
             // Zooming in.
             viewportWidth = viewportWidth / zoom;
             viewportHeight = viewportHeight / zoom;
@@ -292,10 +294,11 @@ var mandelbrot = function () {
         minViewportX += deltaX;
 
         // Animation control
-        this.steps--;
-        if (this.steps < 0) {
+        this.steps++;
+        if (this.steps > this.zoomSteps) {
             this.doZoom = false;
-            this.steps = this.zoomSteps;
+            this.steps = 0;
+            this.zoomSteps = this.initialZoomSteps;
         }
 
     };
@@ -303,13 +306,17 @@ var mandelbrot = function () {
     // Scroll handler
     this.zoom = function (e) {
         // Stop zooming if user scrolls in opposite direction.
-        if (this.doZoom && this.storedE.deltaY !== e.deltaY) {
+        if (this.doZoom && ((this.storedE.deltaY > 0 && e.deltaY < 0)||(this.storedE.deltaY < 0 && e.deltaY > 0))) {
             this.doZoom = false;
-            this.steps = this.zoomSteps;
+            this.steps = 0;
+            this.zoomSteps = this.initialZoomSteps;
             return;
         } else if (this.doZoom) {
             // Extra zooming increases zoom.
-            this.steps += (this.zoomSteps / 10);
+            if (this.zoomSteps < this.initialZoomSteps * 3) {
+                this.zoomSteps += this.initialZoomSteps / 10;
+            }
+            return;
         }
 
         this.storedE = e;
