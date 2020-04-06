@@ -243,7 +243,7 @@ var mandelbrot = function () {
             this.oldY = e.offsetY;
 
             // Update the uniform values.
-            minViewportX -= (deltaX * 2 / this.canvas.width) * viewportWidth;
+            minViewportX -= (deltaX / this.canvas.height) * viewportHeight;
             minViewportY += (deltaY / this.canvas.height) * viewportHeight;
         }
     };
