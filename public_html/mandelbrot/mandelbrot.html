@@ -22,14 +22,22 @@
 
     uniform float height;
 
+    uniform float hue;
+
     #define MAX_ITERATIONS 2000
+
+    // All components are in the range [0…1], including hue.
+    vec3 hsv2rgb(vec3 c) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    }
 
     void main() {
     // Normalized pixel position to complex plane position
     float x = minViewportX+(gl_FragCoord.x/height)*viewportWidth;
     float y = minViewportY+(gl_FragCoord.y/height)*viewportHeight;
 
-    int maxIters = MAX_ITERATIONS;
     // Mandelbrot Set code
     float zr = x;
     float zi = y;
@@ -49,14 +57,17 @@
     float color = 1.0;
     float iter = float(iterations)*20.0;
     float maxIter = float(MAX_ITERATIONS);
-
+    float saturation = 1.0;
     if (iterations != MAX_ITERATIONS-1) {
-    color = iter/maxIter;
+    color = iter/(maxIter/10.0);
+    saturation = iter/(maxIter/2.0);
+    } else {
+    color = 0.0;
+    saturation = 0.0;
     }
 
-    gl_FragColor = vec4(vec3(color), 1.0);
+    gl_FragColor = vec4(hsv2rgb(vec3(color, saturation, saturation)), 1.0);
     }
-
 </div>
 <div id="VertexShader" style="display: none">
     attribute vec2 position;
@@ -66,6 +77,11 @@
     }
 </div>
 <body>
+<div id="settings">
+    <div id="settingsHeader">
+        settings
+    </div>
+</div>
 <canvas id="glCanvas">
     <script src="mandelbrot.js"></script>
 </canvas>

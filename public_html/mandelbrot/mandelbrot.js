@@ -1,5 +1,4 @@
 // TODO Allow for a color picker menu
-// TODO Dynamic iterations.
 
 /**
  * General container for the mandelbrot set.
@@ -28,6 +27,9 @@ var mandelbrot = function () {
         viewportHeight: (function () {
             return viewportHeight;
         }),
+        hue: (function () {
+            return hue;
+        })
     };
 
     // Uniform locations of the variables.
@@ -56,6 +58,24 @@ var mandelbrot = function () {
             return this.canvas.height;
         }).bind(this);
 
+        this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this), false);
+        this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this), false);
+        this.canvas.addEventListener("mousemove", this.onMouseDrag.bind(this), false);
+        this.canvas.addEventListener("wheel", this.zoom.bind(this), false);
+        this.canvas.addEventListener("dblclick", this.zoom.bind(this), false);
+        window.addEventListener("resize", function (){this.canvas.height = innerHeight; this.canvas.width = innerWidth}.bind(this), false);
+
+        hue = Math.random();
+
+        this.build();
+
+        this.animate();
+    };
+
+    /**
+     * Build shader program.
+     */
+    this.build = function () {
         // Clear locations in case it is a new program.
         this.locations = {};
 
@@ -64,13 +84,6 @@ var mandelbrot = function () {
             // Center the set.
             minViewportX = (((4 * innerWidth) / innerHeight) / 2 + 0.5) * -1;
         }
-
-        this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this), false);
-        this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this), false);
-        this.canvas.addEventListener("mousemove", this.onMouseDrag.bind(this), false);
-        this.canvas.addEventListener("wheel", this.zoom.bind(this), false);
-        this.canvas.addEventListener("dblclick", this.zoom.bind(this), false);
-        window.addEventListener("resize", this.init.bind(this), false);
 
         // Initialize GL.
         this.gl = this.initGl(this.canvas);
@@ -114,8 +127,6 @@ var mandelbrot = function () {
         for (const key in this.data) {
             this.setUniformValue(key, this.data[key]);
         }
-
-        this.animate();
     };
 
     /**
@@ -271,7 +282,7 @@ var mandelbrot = function () {
         let deltaY;
 
         // Zoom factor based on gaussian function.
-        let zoom = 1 + gaussianFunction(this.steps, 0.05, this.zoomSteps / 2, this.zoomSteps / 6);
+        let zoom = 1 + gaussianFunction(this.steps, ZOOM_FACTOR, this.zoomSteps / 2, this.zoomSteps / 6);
 
         if (scroll > 0 || scroll === undefined) {
             // Zooming in.
@@ -306,7 +317,7 @@ var mandelbrot = function () {
     // Scroll handler
     this.zoom = function (e) {
         // Stop zooming if user scrolls in opposite direction.
-        if (this.doZoom && ((this.storedE.deltaY > 0 && e.deltaY < 0)||(this.storedE.deltaY < 0 && e.deltaY > 0))) {
+        if (this.doZoom && ((this.storedE.deltaY > 0 && e.deltaY < 0) || (this.storedE.deltaY < 0 && e.deltaY > 0))) {
             this.doZoom = false;
             this.steps = 0;
             this.zoomSteps = this.initialZoomSteps;
@@ -333,11 +344,62 @@ function gaussianFunction(x, a, b, c) {
     return (a * Math.pow(Math.E, -1 * (Math.pow(x - b, 2) / (2 * Math.pow(c, 2)))));
 }
 
+function changeMaxIterations(iterations) {
+    document.getElementById("FragmentShader").innerHTML =
+        document.getElementById("FragmentShader").innerHTML.replace(/#define MAX_ITERATIONS (\d)*/,
+        "#define MAX_ITERATIONS " + iterations);
+    sketch.build();
+}
+
+// Make the DIV element draggable:
+dragElement(document.getElementById("settings"));
+
+function dragElement(elmnt) {
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    if (document.getElementById(elmnt.id + "header")) {
+        // if present, the header is where you move the DIV from:
+        document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+    } else {
+        // otherwise, move the DIV from anywhere inside the DIV:
+        elmnt.onmousedown = dragMouseDown;
+    }
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // set the element's new position:
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+        // stop moving when mouse button is released:
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
 // Used to determine if it is a fresh initialization.
 const INITIAL_VIEWPORT_X = -4.05;
 
 // Factor to zoom in with.
-let ZOOM_FACTOR = 2;
+let ZOOM_FACTOR = 0.05;
 
 // Mandelbrot location
 let minViewportX = INITIAL_VIEWPORT_X;
@@ -346,8 +408,8 @@ let minViewportY = -2;
 // Mandelbrot size
 let viewportWidth = 4;
 let viewportHeight = 4;
+let hue = 0;
 
-// TODO implement variable iterations.
 let iterations = 2000;
 
 

@@ -177,3 +177,30 @@ body {
 
     text-decoration: none;
 }
+
+#settings {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 9;
+    background-color: #f1f1f1;
+    border: 1px solid #d3d3d3;
+    text-align: center;
+    visibility: visible;
+    opacity: 0.25;
+    transition: opacity 0.3s, visibility 0.5s;
+}
+
+#settings:hover {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s, visibility 0.5s;
+}
+
+#settings {
+    padding: 5px;
+    cursor: move;
+    z-index: 10;
+    background-color: var(--main-color);
+    color: #fff;
+}
