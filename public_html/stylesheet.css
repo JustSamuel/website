@@ -178,17 +178,26 @@ body {
     text-decoration: none;
 }
 
+#settingsHeader {
+    display: flex;
+    margin: 2px;
+    align-content: center;
+    justify-content: center;
+}
+
 #settings {
     position: absolute;
     top: 10px;
     left: 10px;
-    z-index: 9;
-    background-color: #f1f1f1;
     border: 1px solid #d3d3d3;
-    text-align: center;
     visibility: visible;
     opacity: 0.25;
     transition: opacity 0.3s, visibility 0.5s;
+    padding: 5px;
+    cursor: move;
+    z-index: 10;
+    background-color: var(--main-color);
+    color: #fff;
 }
 
 #settings:focus {
@@ -197,16 +206,80 @@ body {
     transition: opacity 0.3s, visibility 0.5s;
 }
 
+#settingPanel {
+    max-height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+#settingPanel.active {
+    max-height: 500px;
+    visibility: visible;
+    transition: all 0.3s ease;
+}
+
 #settings:hover {
     visibility: visible;
     opacity: 1;
-    transition: opacity 0.3s, visibility 0.5s;
+    transition: opacity 0.3s ease, visibility ease 0.5s;
 }
 
-#settings {
-    padding: 5px;
-    cursor: move;
-    z-index: 10;
-    background-color: var(--main-color);
-    color: #fff;
+.arrow {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: inline-block;
+    position: relative;
+    margin-left: 0.5rem;
 }
+
+.arrow span {
+    top: 0.5rem;
+    position: absolute;
+    background-color: white;
+    width: 0.75rem;
+    height: 0.1rem;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.arrow span:first-of-type {
+    left: 0;
+    transform: rotate(45deg);
+}
+
+.arrow span:last-of-type {
+    right: 0;
+    transform: rotate(-45deg);
+}
+.arrow.active span:last-of-type{
+    transform: rotate(45deg);
+    right: 0;
+}
+.arrow.active span:first-of-type{
+    transform: rotate(-45deg);
+    left: 0;
+}
+/*#settingPanel {*/
+/*    height: 50px;*/
+/*    opacity: 0;*/
+/*    z-index: 11;*/
+/*    visibility: hidden;*/
+/*    color: #04B1B1;*/
+/*}*/
+
+/*#settingPanel:hover {*/
+/*    height: 100%;*/
+/*    visibility: visible;*/
+/*    opacity: 1;*/
+/*    transition: opacity 0.3s, visibility 0.5s, height 0.5s;*/
+/*}*/
+/*span #settingPanel {*/
+/*    color: #000;*/
+/*    cursor: pointer;*/
+/*    opacity: 0;*/
+/*}*/
+/*span:hover {*/
+/*    opacity: 1;*/
+/*    transition: opacity .5s linear .5s;*/
+/*}*/

@@ -64,9 +64,7 @@ var mandelbrot = function () {
         this.canvas.addEventListener("wheel", this.zoom.bind(this), false);
         this.canvas.addEventListener("dblclick", this.zoom.bind(this), false);
         // window.onscroll = this.zoom.bind(this);
-        window.addEventListener("resize", function (){this.canvas.height = innerHeight; this.canvas.width = innerWidth}.bind(this), false);
-
-        hue = Math.random();
+        window.addEventListener("resize", function (){this.canvas.height = innerHeight; this.canvas.width = innerWidth; this.build()}.bind(this), false);
 
         this.build();
 
@@ -340,7 +338,7 @@ var mandelbrot = function () {
     this.zoomAnimation = function () {
         // Get stored mouse info from when the zooming started.
         let scroll = this.mouseInfo.old.e.deltaY;
-        console.log(scroll);
+
         // Calculate the mouse x end y coordinates w.r.t the mandelbrot set.
         let mouse = {
             x: (minViewportX + (viewportHeight * this.mouseInfo.old.e.offsetX) / innerHeight),
@@ -386,8 +384,7 @@ var mandelbrot = function () {
 
     // Scroll handler
     this.zoom = function (e) {
-        // e.preventDefault();
-        console.log(this.doZoom);
+        e.preventDefault();
         // Stop zooming if user scrolls in opposite direction.
         if (this.doZoom && ((this.mouseInfo.old.e.deltaY > 0 && e.deltaY < 0) || (this.mouseInfo.old.e.deltaY < 0 && e.deltaY > 0))) {
             this.doZoom = false;
@@ -426,6 +423,31 @@ function changeMaxIterations(iterations) {
 // Make the DIV element draggable:
 dragElement(document.getElementById("settings"));
 
+// Settings animation
+document.getElementById("settingsArrow").onmousedown = function() {
+    if (document.getElementById("settingsArrow").classList.contains("active")) {
+        document.getElementById("settingsArrow").classList.remove("active");
+        document.getElementById("settingPanel").classList.remove("active");
+    } else {
+        document.getElementById("settingsArrow").classList.add("active");
+        document.getElementById("settingPanel").classList.add("active");
+    }
+};
+
+// Prevents the setting windows from moving.
+document.getElementById("color").onmousedown = function () {
+    preventDrag = true;
+};
+document.getElementById("color").onmouseup = function () {
+    preventDrag = false;
+};
+document.getElementById("color").oninput = function () {
+    hue = document.getElementById("color").value / 100;
+};
+
+
+let preventDrag = false;
+
 function dragElement(elmnt) {
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     if (document.getElementById(elmnt.id + "header")) {
@@ -440,7 +462,6 @@ function dragElement(elmnt) {
 
     function dragMouseDown(e) {
         e = e || window.event;
-        e.preventDefault();
         if (e.type === "touchstart") {
             pos3 = e.changedTouches[0].clientX;
             pos4 = e.changedTouches[0].clientY;
@@ -457,6 +478,7 @@ function dragElement(elmnt) {
     }
 
     function elementDrag(e) {
+        if (preventDrag) return;
         document.getElementById(elmnt.id).focus();
         if (e.type === "touchmove") {
             pos1 = pos3 - e.changedTouches[0].clientX;
@@ -497,7 +519,7 @@ let minViewportY = -2;
 // Mandelbrot size
 let viewportWidth = 4;
 let viewportHeight = 4;
-let hue = 0;
+let hue = 0.5;
 
 let iterations = 2000;
 

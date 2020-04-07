@@ -58,17 +58,26 @@
     float iter = float(iterations)*20.0;
     float maxIter = float(MAX_ITERATIONS);
     float saturation = 1.0;
+
     if (iterations != MAX_ITERATIONS-1) {
-    color = iter/(maxIter/10.0);
+    color = iter/(maxIter/2.0);
     saturation = iter/(maxIter/2.0);
     } else {
     color = 0.0;
     saturation = 0.0;
     }
 
-    gl_FragColor = vec4(hsv2rgb(vec3(color, saturation, saturation)), 1.0);
+    gl_FragColor = vec4(hsv2rgb(vec3(hue, 1.0, color)), 1.0);
     }
 </div>
+<!--    Old color mapping for the mandelbrot.
+    if (iterations != MAX_ITERATIONS-1) {
+    color = iter/(maxIter/10.0);
+    saturation = iter/(maxIter/2.0);
+    } else {
+    color = 0.0;
+    saturation = 0.0;
+    }-->
 <div id="VertexShader" style="display: none">
     attribute vec2 position;
 
@@ -77,11 +86,17 @@
     }
 </div>
 <body>
-<div id="settings">
+<span id="settings">
     <div id="settingsHeader">
-        settings
+        settings <span class="arrow" id="settingsArrow"><span></span><span></span></span>
     </div>
-</div>
+    <div id="settingPanel">
+         <label>
+             color
+        <input id="color" type="range" min="1" max="100" value="50">
+        </label>
+    </div>
+</span>
 <canvas id="glCanvas">
     <script src="mandelbrot.js"></script>
 </canvas>
