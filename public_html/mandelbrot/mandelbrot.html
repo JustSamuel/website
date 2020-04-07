@@ -65,7 +65,11 @@
     float newhue;
 
     if (iterations != MAX_ITERATIONS-1) {
-    color = mod(iter/(maxIter/iterScale),1.0);
+    if (iterScale != 1.0) {
+        color = mod(iter/(maxIter/iterScale),1.0);
+    } else {
+         color = iter/maxIter;
+    }
     saturation = mod(iter/(maxIter/wave),1.0);
     newhue = hue + mod( hue + (iter/maxIter)*huemod, modvar);
     } else {
@@ -76,14 +80,6 @@
     gl_FragColor = vec4(hsv2rgb(vec3(newhue, 1.0 - saturation, color)), 1.0);
     }
 </div>
-<!--    Old color mapping for the mandelbrot.
-    if (iterations != MAX_ITERATIONS-1) {
-    color = iter/(maxIter/10.0);
-    saturation = iter/(maxIter/2.0);
-    } else {
-    color = 0.0;
-    saturation = 0.0;
-    }-->
 <div id="VertexShader" style="display: none">
     attribute vec2 position;
 
@@ -109,7 +105,7 @@
         <br>
         <label>
              speed of light<BR>
-        <input id="scale" type="range" min="0" max="2" value="0">
+        <input id="scale" type="range" min="0" max="3" value="0">
         </label>
         <br>
         <label>
@@ -119,7 +115,7 @@
                 <br>
         <label>
                 wavelength<BR>
-        <input id="wave" type="range" min="0" max="100" value="0">
+        <input id="wave" type="range" min="0" max="500" value="0">
         </label>
     </div>
 </span>

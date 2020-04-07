@@ -471,11 +471,14 @@ document.getElementById("scale").oninput = function () {
     let value = document.getElementById("scale").value;
     if (value == 0) {
         scale = 1.0;
-    } else if (value == 2) {
-        scale = iterations-1;
+    } else if (value == 1) {
+        scale = 1.5;
+    } else if (value == 3) {
+        scale = iterations - 1;
     } else {
         scale = (document.getElementById("scale").value / 3) * (iterations - 1);
     }
+    console.log("value == " + value);
     console.log(document.getElementById("scale").value);
 };
 
