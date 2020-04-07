@@ -265,7 +265,6 @@ var mandelbrot = function () {
             }
         }else{
             this.mouseInfo.doubletap = false;
-            // too much time to be a doubletap
         }
 
         this.mouseInfo.latesttap = new Date().getTime();
@@ -351,26 +350,27 @@ var mandelbrot = function () {
 
         // Zoom factor based on gaussian function.
         let zoom = 1 + gaussianFunction(this.steps, ZOOM_FACTOR, this.zoomSteps / 2, this.zoomSteps / 6);
+        if (!(viewportWidth > 12 && this.mouseInfo.old.e.deltaY < 0)) {
+            if (scroll > 0 || scroll === undefined) {
+                // Zooming in.
+                viewportWidth = viewportWidth / zoom;
+                viewportHeight = viewportHeight / zoom;
 
-        if (scroll > 0 || scroll === undefined) {
-            // Zooming in.
-            viewportWidth = viewportWidth / zoom;
-            viewportHeight = viewportHeight / zoom;
+                deltaX = (mouse.x - minViewportX) * (1 - (1 / zoom));
+                deltaY = (mouse.y - minViewportY) * (1 - (1 / zoom));
+            } else {
+                // Zooming out
+                viewportWidth = viewportWidth * zoom;
+                viewportHeight = viewportHeight * zoom;
 
-            deltaX = (mouse.x - minViewportX) * (1 - (1 / zoom));
-            deltaY = (mouse.y - minViewportY) * (1 - (1 / zoom));
-        } else {
-            // Zooming out
-            viewportWidth = viewportWidth * zoom;
-            viewportHeight = viewportHeight * zoom;
+                deltaX = (mouse.x - minViewportX) * (1 - zoom);
+                deltaY = (mouse.y - minViewportY) * (1 - zoom);
+            }
 
-            deltaX = (mouse.x - minViewportX) * (1 - zoom);
-            deltaY = (mouse.y - minViewportY) * (1 - zoom);
+            // Apply translation
+            minViewportY += deltaY;
+            minViewportX += deltaX;
         }
-
-        // Apply translation
-        minViewportY += deltaY;
-        minViewportX += deltaX;
 
         // Animation control
         this.steps++;
@@ -424,7 +424,7 @@ function changeMaxIterations(iterations) {
 dragElement(document.getElementById("settings"));
 
 // Settings animation
-document.getElementById("settingsArrow").onmousedown = function() {
+document.getElementById("settings").onmousedown = function() {
     if (document.getElementById("settingsArrow").classList.contains("active")) {
         document.getElementById("settingsArrow").classList.remove("active");
         document.getElementById("settingPanel").classList.remove("active");
