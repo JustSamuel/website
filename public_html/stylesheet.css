@@ -202,6 +202,13 @@ body {
     color: #fff;
 }
 
+#button {
+    font-family: "Raleway";
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
 #settings:focus {
     visibility: visible;
     opacity: 1;

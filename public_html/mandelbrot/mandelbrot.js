@@ -1,5 +1,3 @@
-// TODO Allow for a color picker menu
-
 /**
  * General container for the mandelbrot set.
  */
@@ -13,35 +11,21 @@ var mandelbrot = function () {
     // Shader Program containing the mandelbrot set.
     this.shaderProgram = undefined;
 
+    this.iterations = 2000;
+
     // All uniform variables used in the mandelbrot.
+    // Variables must match their respective name in the webgl code.
     this.data = {
-        minViewportX: (function () {
-            return minViewportX;
-        }),
-        minViewportY: (function () {
-            return minViewportY;
-        }),
-        viewportWidth: (function () {
-            return viewportWidth;
-        }),
-        viewportHeight: (function () {
-            return viewportHeight;
-        }),
-        hue: (function () {
-            return hue;
-        }),
-        modvar: (function () {
-            return mod;
-        }),
-        iterScale: (function () {
-            return scale;
-        }),
-        huemod: (function () {
-            return huemod;
-        }),
-        wave: (function () {
-            return wave;
-        })
+        minViewportX: INITIAL_VIEWPORT_X,
+        minViewportY: -2,
+        viewportWidth: 4,
+        viewportHeight: 4,
+        height: 0,
+        hue: 0,
+        wave: 0,
+        modvar: 1,
+        huemod: 0,
+        iterScale: 1.0,
     };
 
     // Uniform locations of the variables.
@@ -63,9 +47,7 @@ var mandelbrot = function () {
         this.canvas.height = innerHeight;
 
         // Add canvas to data set.
-        this.data.height = (function () {
-            return this.canvas.height;
-        }).bind(this);
+        this.data.height = this.canvas.height;
 
         this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this), false);
         this.canvas.addEventListener("touchstart", this.onMouseDown.bind(this), false);
@@ -75,7 +57,6 @@ var mandelbrot = function () {
         this.canvas.addEventListener("touchmove", this.onMouseDrag.bind(this), false);
         this.canvas.addEventListener("wheel", this.zoom.bind(this), false);
         this.canvas.addEventListener("dblclick", this.zoom.bind(this), false);
-        // window.onscroll = this.zoom.bind(this);
         window.addEventListener("resize", function (){this.canvas.height = innerHeight; this.canvas.width = innerWidth; this.build()}.bind(this), false);
 
         this.build();
@@ -91,9 +72,9 @@ var mandelbrot = function () {
         this.locations = {};
 
         // Initial draw.
-        if (minViewportX === INITIAL_VIEWPORT_X) {
+        if (this.data.minViewportX === INITIAL_VIEWPORT_X) {
             // Center the set.
-            minViewportX = (((4 * innerWidth) / innerHeight) / 2 + 0.5) * -1;
+            this.data.minViewportX = (((4 * innerWidth) / innerHeight) / 2 + 0.5) * -1;
         }
 
         // Initialize GL.
@@ -169,7 +150,7 @@ var mandelbrot = function () {
      */
     this.updateValues = function () {
         for (const key in this.data) {
-            this.gl.uniform1f(this.locations[key], this.data[key]());
+            this.gl.uniform1f(this.locations[key], this.data[key]);
         }
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
@@ -332,8 +313,8 @@ var mandelbrot = function () {
                 this.mouseInfo.old.y = client.y;
 
                 // Update the uniform values.
-                minViewportX -= (deltaX / this.canvas.height) * viewportHeight;
-                minViewportY += (deltaY / this.canvas.height) * viewportHeight;
+                this.data.minViewportX -= (deltaX / this.canvas.height) * this.data.viewportHeight;
+                this.data.minViewportY += (deltaY / this.canvas.height) * this.data.viewportHeight;
             }
         }
     };
@@ -352,8 +333,8 @@ var mandelbrot = function () {
 
         // Calculate the mouse x end y coordinates w.r.t the mandelbrot set.
         let mouse = {
-            x: (minViewportX + (viewportHeight * this.mouseInfo.old.e.offsetX) / innerHeight),
-            y: minViewportY + ((viewportHeight * -1 * (this.mouseInfo.old.e.offsetY - innerHeight)) / innerHeight),
+            x: (this.data.minViewportX + (this.data.viewportHeight * this.mouseInfo.old.e.offsetX) / innerHeight),
+            y: this.data.minViewportY + ((this.data.viewportHeight * -1 * (this.mouseInfo.old.e.offsetY - innerHeight)) / innerHeight),
         };
 
         // Translation needed to zoom in on the mouse.
@@ -362,26 +343,26 @@ var mandelbrot = function () {
 
         // Zoom factor based on gaussian function.
         let zoom = 1 + gaussianFunction(this.steps, ZOOM_FACTOR, this.zoomSteps / 2, this.zoomSteps / 6);
-        if (!(viewportWidth > 12 && this.mouseInfo.old.e.deltaY < 0)) {
+        if (!(this.data.viewportWidth > 12 && this.mouseInfo.old.e.deltaY < 0)) {
             if (scroll > 0 || scroll === undefined) {
                 // Zooming in.
-                viewportWidth = viewportWidth / zoom;
-                viewportHeight = viewportHeight / zoom;
+                this.data.viewportWidth = this.data.viewportWidth / zoom;
+                this.data.viewportHeight = this.data.viewportHeight / zoom;
 
-                deltaX = (mouse.x - minViewportX) * (1 - (1 / zoom));
-                deltaY = (mouse.y - minViewportY) * (1 - (1 / zoom));
+                deltaX = (mouse.x - this.data.minViewportX) * (1 - (1 / zoom));
+                deltaY = (mouse.y - this.data.minViewportY) * (1 - (1 / zoom));
             } else {
                 // Zooming out
-                viewportWidth = viewportWidth * zoom;
-                viewportHeight = viewportHeight * zoom;
+                this.data.viewportWidth = this.data.viewportWidth * zoom;
+                this.data.viewportHeight = this.data.viewportHeight * zoom;
 
-                deltaX = (mouse.x - minViewportX) * (1 - zoom);
-                deltaY = (mouse.y - minViewportY) * (1 - zoom);
+                deltaX = (mouse.x - this.data.minViewportX) * (1 - zoom);
+                deltaY = (mouse.y - this.data.minViewportY) * (1 - zoom);
             }
 
             // Apply translation
-            minViewportY += deltaY;
-            minViewportX += deltaX;
+            this.data.minViewportY += deltaY;
+            this.data.minViewportX += deltaX;
         }
 
         // Animation control
@@ -438,7 +419,6 @@ let pressEvent = undefined;
 document.getElementById("settingsHeader").onmousedown = function (e) {
     pressEvent = e;
 };
-
 // Settings animation
 document.getElementById("settingsHeader").onclick = function(e) {
     if (e.pageX !== pressEvent.pageX || e.pageY !== pressEvent.pageY) return;
@@ -451,44 +431,21 @@ document.getElementById("settingsHeader").onclick = function(e) {
     }
 };
 
-document.getElementById("color").oninput = function () {
-    hue = document.getElementById("color").value / 100;
-};
-
-document.getElementById("modvar").oninput = function () {
-    mod = document.getElementById("modvar").value / 100;
-};
-
-document.getElementById("huemod").oninput = function () {
-    huemod = document.getElementById("huemod").value / 100;
-};
-
-document.getElementById("wave").oninput = function () {
-    wave = document.getElementById("wave").value / 100;
-};
-
-document.getElementById("scale").oninput = function () {
-    let value = document.getElementById("scale").value;
+document.getElementById("iterScale").oninput = function update() {
+    let scale = document.getElementById("iterScale");
+    let value = scale.value;
     if (value == 0) {
-        scale = 1.0;
+        sketch.data.iterScale = 1.0;
     } else if (value == 1) {
-        scale = 1.5;
-    } else if (value == 3) {
-        scale = iterations - 1;
+        sketch.data.iterScale = 1.5;
+    } else if (value == scale.max) {
+        sketch.data.iterScale = sketch.iterations - 1;
     } else {
-        scale = (document.getElementById("scale").value / 3) * (iterations - 1);
+        sketch.data.iterScale = (scale.value / scale.max) * (sketch.iterations - 1);
     }
-    console.log("value == " + value);
-    console.log(document.getElementById("scale").value);
 };
 
 let preventDrag = false;
-
-disableMenuDrag(document.getElementById("color"));
-disableMenuDrag(document.getElementById("wave"));
-disableMenuDrag(document.getElementById("modvar"));
-disableMenuDrag(document.getElementById("scale"));
-disableMenuDrag(document.getElementById("huemod"));
 
 /**
  * Prevents sliders from interfering with the settings drag
@@ -572,23 +529,32 @@ const INITIAL_VIEWPORT_X = -4.05;
 // Factor to zoom in with.
 let ZOOM_FACTOR = 0.05;
 
-// Mandelbrot location
-let minViewportX = INITIAL_VIEWPORT_X;
-let minViewportY = -2;
-
-// Mandelbrot size
-let viewportWidth = 4;
-let viewportHeight = 4;
-
-// Color sliders
-let hue = 0.5;
-let mod = 1;
-let scale = 1.0;
-let huemod = 0;
-let wave = 0;
-
-let iterations = 2000;
-
+// List of sliders we have defined.
+let sliders = ["hue", "wave", "modvar", "iterScale", "huemod"];
 
 var sketch = new mandelbrot();
 sketch.init();
+
+// Basic setup for most sliders
+for (let slider of sliders) {
+    let element = document.getElementById(slider);
+    disableMenuDrag(element);
+    if (slider !== "iterScale") {
+        // Add our sliders to the variable data.
+        element.oninput = function () {
+            sketch.data[element.id] = element.value / element.max;
+        };
+
+        sketch.data[slider] = element.value / element.max;
+    }
+}
+sketch.data.iterScale = 1.0;
+
+// Random settings.
+function randomSliders() {
+    for (let slider of sliders) {
+        let element = document.getElementById(slider);
+        element.value = Math.random() * element.max;
+        element.oninput(element.value);
+    }
+}
