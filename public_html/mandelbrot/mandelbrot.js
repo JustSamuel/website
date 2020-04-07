@@ -63,7 +63,7 @@ var mandelbrot = function () {
         this.canvas.addEventListener("touchmove", this.onMouseDrag.bind(this), false);
         this.canvas.addEventListener("wheel", this.zoom.bind(this), false);
         this.canvas.addEventListener("dblclick", this.zoom.bind(this), false);
-        window.onscroll = this.zoom.bind(this);
+        // window.onscroll = this.zoom.bind(this);
         window.addEventListener("resize", function (){this.canvas.height = innerHeight; this.canvas.width = innerWidth}.bind(this), false);
 
         hue = Math.random();
@@ -229,14 +229,57 @@ var mandelbrot = function () {
             e: undefined,
         },
         mousedown: false,
+        latesttap: undefined,
+        doubletap: false,
+        event: undefined,
+        drag: false,
+    };
+
+    let doubleTapTimeout = undefined;
+
+    // Double tap to zoom in, tripple tap to zoom out.
+    this.onTouchDown = function (e) {
+        // We use a timer to check if we should count it as double tap or not
+        let now = new Date().getTime();
+        let timesince = now - this.mouseInfo.latesttap;
+        if((timesince < 600) && (timesince > 0) && !this.mouseInfo.drag){
+            // Create custom event to send to zoom handler.
+            this.mouseInfo.event = {
+                deltaY : 1,
+                offsetX : e.changedTouches[0].pageX,
+                offsetY : e.changedTouches[0].pageY,
+            };
+
+            // If we have double tapped, we do tripple tap zoomout.
+            if (this.mouseInfo.doubletap) {
+                clearTimeout(doubleTapTimeout);
+                this.mouseInfo.event.deltaY = -1;
+                this.zoom(this.mouseInfo.event);
+                this.mouseInfo.doubletap = false;
+            } else {
+                this.mouseInfo.doubletap = true;
+                // Set a timeout to check if user actually wants to zoom out instead.
+                doubleTapTimeout = setTimeout(async () => {
+                    if (this.mouseInfo.doubletap) {
+                        this.zoom(this.mouseInfo.event);
+                    }
+                },300);
+            }
+        }else{
+            this.mouseInfo.doubletap = false;
+            // too much time to be a doubletap
+        }
+
+        this.mouseInfo.latesttap = new Date().getTime();
+
     };
 
     // Update mouse values on click and enable dragging.
     this.onMouseDown = function (e) {
-        e.preventDefault();
         if (e.type === "touchstart") {
             this.mouseInfo.old.x = e.changedTouches[0].pageX;
             this.mouseInfo.old.y = e.changedTouches[0].pageY;
+            this.onTouchDown(e);
         } else {
             this.mouseInfo.old.x = e.clientX;
             this.mouseInfo.old.y = e.clientY;
@@ -247,6 +290,10 @@ var mandelbrot = function () {
     // Disable dragging.
     this.onMouseUp = function (e) {
         e.preventDefault();
+        // Grace period after dragging that still counts as dragging.
+        setTimeout(async () => {
+            this.mouseInfo.drag = false;
+        }, 500);
         this.mouseInfo.mousedown = false;
     };
 
@@ -254,6 +301,7 @@ var mandelbrot = function () {
     this.onMouseDrag = function (e) {
         e.preventDefault();
         if (this.mouseInfo.mousedown) {
+            this.mouseInfo.drag = true;
             let client = {};
             // Distinction between mobile and desktop.
             if (e.type === "touchmove") {
@@ -292,7 +340,7 @@ var mandelbrot = function () {
     this.zoomAnimation = function () {
         // Get stored mouse info from when the zooming started.
         let scroll = this.mouseInfo.old.e.deltaY;
-
+        console.log(scroll);
         // Calculate the mouse x end y coordinates w.r.t the mandelbrot set.
         let mouse = {
             x: (minViewportX + (viewportHeight * this.mouseInfo.old.e.offsetX) / innerHeight),
@@ -338,7 +386,8 @@ var mandelbrot = function () {
 
     // Scroll handler
     this.zoom = function (e) {
-        e.preventDefault();
+        // e.preventDefault();
+        console.log(this.doZoom);
         // Stop zooming if user scrolls in opposite direction.
         if (this.doZoom && ((this.mouseInfo.old.e.deltaY > 0 && e.deltaY < 0) || (this.mouseInfo.old.e.deltaY < 0 && e.deltaY > 0))) {
             this.doZoom = false;
