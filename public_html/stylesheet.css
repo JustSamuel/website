@@ -180,12 +180,14 @@ body {
 
 #settingsHeader {
     display: flex;
-    margin: 2px;
+    margin: 5px 2px 4px;
     align-content: center;
     justify-content: center;
 }
 
 #settings {
+    font-family: "Raleway";
+    font-weight: lighter;
     position: absolute;
     top: 10px;
     left: 10px;
@@ -225,6 +227,11 @@ body {
     transition: opacity 0.3s ease, visibility ease 0.5s;
 }
 
+
+/**
+ * Arrow animation by Simon Breiter
+ * @link https://simonbreiter.com/
+ */
 .arrow {
     width: 1.25rem;
     height: 1.25rem;
@@ -245,41 +252,18 @@ body {
 
 .arrow span:first-of-type {
     left: 0;
-    transform: rotate(45deg);
+    transform: rotate(-45deg);
 }
 
 .arrow span:last-of-type {
     right: 0;
-    transform: rotate(-45deg);
+    transform: rotate(45deg);
 }
 .arrow.active span:last-of-type{
-    transform: rotate(45deg);
+    transform: rotate(-45deg);
     right: 0;
 }
 .arrow.active span:first-of-type{
-    transform: rotate(-45deg);
+    transform: rotate(45deg);
     left: 0;
 }
-/*#settingPanel {*/
-/*    height: 50px;*/
-/*    opacity: 0;*/
-/*    z-index: 11;*/
-/*    visibility: hidden;*/
-/*    color: #04B1B1;*/
-/*}*/
-
-/*#settingPanel:hover {*/
-/*    height: 100%;*/
-/*    visibility: visible;*/
-/*    opacity: 1;*/
-/*    transition: opacity 0.3s, visibility 0.5s, height 0.5s;*/
-/*}*/
-/*span #settingPanel {*/
-/*    color: #000;*/
-/*    cursor: pointer;*/
-/*    opacity: 0;*/
-/*}*/
-/*span:hover {*/
-/*    opacity: 1;*/
-/*    transition: opacity .5s linear .5s;*/
-/*}*/

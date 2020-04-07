@@ -29,6 +29,18 @@ var mandelbrot = function () {
         }),
         hue: (function () {
             return hue;
+        }),
+        modvar: (function () {
+            return mod;
+        }),
+        iterScale: (function () {
+            return scale;
+        }),
+        huemod: (function () {
+            return huemod;
+        }),
+        wave: (function () {
+            return wave;
         })
     };
 
@@ -384,7 +396,6 @@ var mandelbrot = function () {
 
     // Scroll handler
     this.zoom = function (e) {
-        e.preventDefault();
         // Stop zooming if user scrolls in opposite direction.
         if (this.doZoom && ((this.mouseInfo.old.e.deltaY > 0 && e.deltaY < 0) || (this.mouseInfo.old.e.deltaY < 0 && e.deltaY > 0))) {
             this.doZoom = false;
@@ -422,9 +433,15 @@ function changeMaxIterations(iterations) {
 
 // Make the DIV element draggable:
 dragElement(document.getElementById("settings"));
+let pressEvent = undefined;
+
+document.getElementById("settingsHeader").onmousedown = function (e) {
+    pressEvent = e;
+};
 
 // Settings animation
-document.getElementById("settings").onmousedown = function() {
+document.getElementById("settingsHeader").onclick = function(e) {
+    if (e.pageX !== pressEvent.pageX || e.pageY !== pressEvent.pageY) return;
     if (document.getElementById("settingsArrow").classList.contains("active")) {
         document.getElementById("settingsArrow").classList.remove("active");
         document.getElementById("settingPanel").classList.remove("active");
@@ -434,19 +451,59 @@ document.getElementById("settings").onmousedown = function() {
     }
 };
 
-// Prevents the setting windows from moving.
-document.getElementById("color").onmousedown = function () {
-    preventDrag = true;
-};
-document.getElementById("color").onmouseup = function () {
-    preventDrag = false;
-};
 document.getElementById("color").oninput = function () {
     hue = document.getElementById("color").value / 100;
 };
 
+document.getElementById("modvar").oninput = function () {
+    mod = document.getElementById("modvar").value / 100;
+};
+
+document.getElementById("huemod").oninput = function () {
+    huemod = document.getElementById("huemod").value / 100;
+};
+
+document.getElementById("wave").oninput = function () {
+    wave = document.getElementById("wave").value / 100;
+};
+
+document.getElementById("scale").oninput = function () {
+    let value = document.getElementById("scale").value;
+    if (value == 0) {
+        scale = 1.0;
+    } else if (value == 2) {
+        scale = iterations-1;
+    } else {
+        scale = (document.getElementById("scale").value / 3) * (iterations - 1);
+    }
+    console.log(document.getElementById("scale").value);
+};
 
 let preventDrag = false;
+
+disableMenuDrag(document.getElementById("color"));
+disableMenuDrag(document.getElementById("wave"));
+disableMenuDrag(document.getElementById("modvar"));
+disableMenuDrag(document.getElementById("scale"));
+disableMenuDrag(document.getElementById("huemod"));
+
+/**
+ * Prevents sliders from interfering with the settings drag
+ */
+function disableMenuDrag(element) {
+    element.onmousedown = function () {
+        preventDrag = true
+    };
+    element.ontouchstart = function () {
+        preventDrag = true;
+    };
+    element.onmouseup = function () {
+        preventDrag = false;
+    };
+    element.ontouchend = function () {
+        preventDrag = false
+    }
+}
 
 function dragElement(elmnt) {
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -519,7 +576,13 @@ let minViewportY = -2;
 // Mandelbrot size
 let viewportWidth = 4;
 let viewportHeight = 4;
+
+// Color sliders
 let hue = 0.5;
+let mod = 1;
+let scale = 1.0;
+let huemod = 0;
+let wave = 0;
 
 let iterations = 2000;
 

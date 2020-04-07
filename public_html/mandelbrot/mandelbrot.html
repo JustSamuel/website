@@ -23,6 +23,10 @@
     uniform float height;
 
     uniform float hue;
+    uniform float modvar;
+    uniform float iterScale;
+    uniform float huemod;
+    uniform float wave;
 
     #define MAX_ITERATIONS 2000
 
@@ -58,16 +62,18 @@
     float iter = float(iterations)*20.0;
     float maxIter = float(MAX_ITERATIONS);
     float saturation = 1.0;
+    float newhue;
 
     if (iterations != MAX_ITERATIONS-1) {
-    color = iter/(maxIter/2.0);
-    saturation = iter/(maxIter/2.0);
+    color = mod(iter/(maxIter/iterScale),1.0);
+    saturation = mod(iter/(maxIter/wave),1.0);
+    newhue = hue + mod( hue + (iter/maxIter)*huemod, modvar);
     } else {
     color = 0.0;
     saturation = 0.0;
     }
 
-    gl_FragColor = vec4(hsv2rgb(vec3(hue, 1.0, color)), 1.0);
+    gl_FragColor = vec4(hsv2rgb(vec3(newhue, 1.0 - saturation, color)), 1.0);
     }
 </div>
 <!--    Old color mapping for the mandelbrot.
@@ -92,8 +98,28 @@
     </div>
     <div id="settingPanel">
          <label>
-             color
+             color<BR>
         <input id="color" type="range" min="1" max="100" value="50">
+        </label>
+        <br>
+        <label>
+             flux-capacitor<BR>
+        <input id="modvar" type="range" min="1" max="100" value="100">
+        </label>
+        <br>
+        <label>
+             speed of light<BR>
+        <input id="scale" type="range" min="0" max="2" value="0">
+        </label>
+        <br>
+        <label>
+             nuclear decay<BR>
+        <input id="huemod" type="range" min="0" max="200" value="0">
+        </label>
+                <br>
+        <label>
+                wavelength<BR>
+        <input id="wave" type="range" min="0" max="100" value="0">
         </label>
     </div>
 </span>
