@@ -191,6 +191,12 @@ body {
     transition: opacity 0.3s, visibility 0.5s;
 }
 
+#settings:focus {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s, visibility 0.5s;
+}
+
 #settings:hover {
     visibility: visible;
     opacity: 1;

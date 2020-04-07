@@ -35,9 +35,6 @@ var mandelbrot = function () {
     // Uniform locations of the variables.
     this.locations = {};
 
-    // Mouse information used for the zooming information.
-    this.storedE = undefined;
-
     // Amount of steps.
     this.zoomSteps = 50;
     this.initialZoomSteps = this.zoomSteps;
@@ -59,8 +56,11 @@ var mandelbrot = function () {
         }).bind(this);
 
         this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this), false);
+        this.canvas.addEventListener("touchstart", this.onMouseDown.bind(this), false);
         this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this), false);
+        this.canvas.addEventListener("touchend", this.onMouseUp.bind(this), false);
         this.canvas.addEventListener("mousemove", this.onMouseDrag.bind(this), false);
+        this.canvas.addEventListener("touchmove", this.onMouseDrag.bind(this), false);
         this.canvas.addEventListener("wheel", this.zoom.bind(this), false);
         this.canvas.addEventListener("dblclick", this.zoom.bind(this), false);
         window.addEventListener("resize", function (){this.canvas.height = innerHeight; this.canvas.width = innerWidth}.bind(this), false);
@@ -221,41 +221,59 @@ var mandelbrot = function () {
     };
 
     // Used for dragging the mandelbrot.
-    this.deltaX = undefined;
-    this.deltaY = undefined;
-    this.oldX = undefined;
-    this.oldY = undefined;
-    this.mousedown = false;
+    this.mouseInfo = {
+        old : {
+            x: undefined,
+            y: undefined,
+            e: undefined,
+        },
+        mousedown: false,
+    };
 
     // Update mouse values on click and enable dragging.
     this.onMouseDown = function (e) {
-        this.oldX = e.offsetX;
-        this.oldY = e.offsetY;
-        this.mousedown = true;
+        if (e.type === "touchstart") {
+            this.mouseInfo.old.x = e.changedTouches[0].pageX;
+            this.mouseInfo.old.y = e.changedTouches[0].pageY;
+        } else {
+            this.mouseInfo.old.x = e.clientX;
+            this.mouseInfo.old.y = e.clientY;
+        }
+        this.mouseInfo.mousedown = true;
     };
 
     // Disable dragging.
     this.onMouseUp = function (e) {
-        this.mousedown = false;
+        this.mouseInfo.mousedown = false;
     };
 
     // Drag the mandelbrot set.
     this.onMouseDrag = function (e) {
-        if (this.mousedown) {
-            if (this.oldX === undefined || 0) {
-                this.oldX = e.offsetX;
-                this.oldY = e.offsetY;
+        if (this.mouseInfo.mousedown) {
+            let client = {};
+            // Distinction between mobile and desktop.
+            if (e.type === "touchmove") {
+                client.x = e.changedTouches[0].pageX;
+                client.y = e.changedTouches[0].pageY;
+            } else {
+                client.x = e.clientX;
+                client.y = e.clientY;
             }
 
-            let deltaX = e.offsetX - this.oldX;
-            let deltaY = e.offsetY - this.oldY;
+            if (this.mouseInfo.old.x === undefined || this.mouseInfo.old.y === undefined) {
+                this.mouseInfo.old.x = client.x;
+                this.mouseInfo.old.y = client.y;
+            } else {
+                let deltaX = client.x - this.mouseInfo.old.x;
+                let deltaY = client.y - this.mouseInfo.old.y;
 
-            this.oldX = e.offsetX;
-            this.oldY = e.offsetY;
+                this.mouseInfo.old.x = client.x;
+                this.mouseInfo.old.y = client.y;
 
-            // Update the uniform values.
-            minViewportX -= (deltaX / this.canvas.height) * viewportHeight;
-            minViewportY += (deltaY / this.canvas.height) * viewportHeight;
+                // Update the uniform values.
+                minViewportX -= (deltaX / this.canvas.height) * viewportHeight;
+                minViewportY += (deltaY / this.canvas.height) * viewportHeight;
+            }
         }
     };
 
@@ -269,12 +287,12 @@ var mandelbrot = function () {
      */
     this.zoomAnimation = function () {
         // Get stored mouse info from when the zooming started.
-        let scroll = this.storedE.deltaY;
+        let scroll = this.mouseInfo.old.e.deltaY;
 
         // Calculate the mouse x end y coordinates w.r.t the mandelbrot set.
         let mouse = {
-            x: (minViewportX + (viewportHeight * this.storedE.offsetX) / innerHeight),
-            y: minViewportY + ((viewportHeight * -1 * (this.storedE.offsetY - innerHeight)) / innerHeight),
+            x: (minViewportX + (viewportHeight * this.mouseInfo.old.e.offsetX) / innerHeight),
+            y: minViewportY + ((viewportHeight * -1 * (this.mouseInfo.old.e.offsetY - innerHeight)) / innerHeight),
         };
 
         // Translation needed to zoom in on the mouse.
@@ -317,7 +335,7 @@ var mandelbrot = function () {
     // Scroll handler
     this.zoom = function (e) {
         // Stop zooming if user scrolls in opposite direction.
-        if (this.doZoom && ((this.storedE.deltaY > 0 && e.deltaY < 0) || (this.storedE.deltaY < 0 && e.deltaY > 0))) {
+        if (this.doZoom && ((this.mouseInfo.old.e.deltaY > 0 && e.deltaY < 0) || (this.mouseInfo.old.e.deltaY < 0 && e.deltaY > 0))) {
             this.doZoom = false;
             this.steps = 0;
             this.zoomSteps = this.initialZoomSteps;
@@ -330,7 +348,7 @@ var mandelbrot = function () {
             return;
         }
 
-        this.storedE = e;
+        this.mouseInfo.old.e = e;
         this.doZoom = true;
     };
 
@@ -359,30 +377,45 @@ function dragElement(elmnt) {
     if (document.getElementById(elmnt.id + "header")) {
         // if present, the header is where you move the DIV from:
         document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+        document.getElementById(elmnt.id + "header").ontouchstart = dragMouseDown;
     } else {
         // otherwise, move the DIV from anywhere inside the DIV:
         elmnt.onmousedown = dragMouseDown;
+        elmnt.ontouchstart = dragMouseDown;
     }
 
     function dragMouseDown(e) {
         e = e || window.event;
         e.preventDefault();
-        // get the mouse cursor position at startup:
-        pos3 = e.clientX;
-        pos4 = e.clientY;
+        if (e.type === "touchstart") {
+            pos3 = e.changedTouches[0].clientX;
+            pos4 = e.changedTouches[0].clientY;
+        } else {
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+        }
         document.onmouseup = closeDragElement;
+        document.ontouchend = closeDragElement;
         // call a function whenever the cursor moves:
         document.onmousemove = elementDrag;
+        document.ontouchmove = elementDrag;
     }
 
     function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // calculate the new cursor position:
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
+        document.getElementById(elmnt.id).focus();
+        if (e.type === "touchmove") {
+            pos1 = pos3 - e.changedTouches[0].clientX;
+            pos2 = pos4 - e.changedTouches[0].clientY;
+            pos3 = e.changedTouches[0].clientX;
+            pos4 = e.changedTouches[0].clientY;
+        } else {
+            // calculate the new cursor position:
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+        }
         // set the element's new position:
         elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
         elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
@@ -392,6 +425,8 @@ function dragElement(elmnt) {
         // stop moving when mouse button is released:
         document.onmouseup = null;
         document.onmousemove = null;
+        document.ontouchmove = null;
+        document.ontouchcancel = null;
     }
 }
 
