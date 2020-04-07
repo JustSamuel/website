@@ -63,6 +63,7 @@ var mandelbrot = function () {
         this.canvas.addEventListener("touchmove", this.onMouseDrag.bind(this), false);
         this.canvas.addEventListener("wheel", this.zoom.bind(this), false);
         this.canvas.addEventListener("dblclick", this.zoom.bind(this), false);
+        window.onscroll = this.zoom.bind(this);
         window.addEventListener("resize", function (){this.canvas.height = innerHeight; this.canvas.width = innerWidth}.bind(this), false);
 
         hue = Math.random();
@@ -232,6 +233,7 @@ var mandelbrot = function () {
 
     // Update mouse values on click and enable dragging.
     this.onMouseDown = function (e) {
+        e.preventDefault();
         if (e.type === "touchstart") {
             this.mouseInfo.old.x = e.changedTouches[0].pageX;
             this.mouseInfo.old.y = e.changedTouches[0].pageY;
@@ -244,11 +246,13 @@ var mandelbrot = function () {
 
     // Disable dragging.
     this.onMouseUp = function (e) {
+        e.preventDefault();
         this.mouseInfo.mousedown = false;
     };
 
     // Drag the mandelbrot set.
     this.onMouseDrag = function (e) {
+        e.preventDefault();
         if (this.mouseInfo.mousedown) {
             let client = {};
             // Distinction between mobile and desktop.
@@ -334,6 +338,7 @@ var mandelbrot = function () {
 
     // Scroll handler
     this.zoom = function (e) {
+        e.preventDefault();
         // Stop zooming if user scrolls in opposite direction.
         if (this.doZoom && ((this.mouseInfo.old.e.deltaY > 0 && e.deltaY < 0) || (this.mouseInfo.old.e.deltaY < 0 && e.deltaY > 0))) {
             this.doZoom = false;
