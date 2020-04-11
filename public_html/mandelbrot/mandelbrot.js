@@ -28,6 +28,10 @@ var mandelbrot = function () {
         iterScale: 1.0,
     };
 
+    // Hue animations.
+    this.an = false;
+    this.settingsAnimationSteps = 10;
+
     // Uniform locations of the variables.
     this.locations = {};
 
@@ -144,7 +148,18 @@ var mandelbrot = function () {
     this.animate = function () {
         window.requestAnimationFrame(this.animate.bind(this));
         if (this.doZoom) {this.zoomAnimation()};
+        this.hueAnimation();
         this.updateValues();
+    };
+
+    /**
+     * Slowly walk through the hue.
+     */
+    this.hueAnimation = function () {
+        if (this.an) {
+            this.data.hue += 0.001;
+            this.data.hue = this.data.hue % 1;
+        }
     };
 
     /**
@@ -424,17 +439,18 @@ document.getElementById("settingsHeader").onmousedown = function (e) {
 // Settings animation
 document.getElementById("settingsHeader").onclick = function(e) {
     if (e.pageX !== pressEvent.pageX || e.pageY !== pressEvent.pageY) return;
-    if (document.getElementById("settingPanel").classList.contains("active")) {
-        document.getElementById("settingPanel").classList.remove("active");
+    if (settingsPanel.classList.contains("active")) {
+        settingsPanel.classList.remove("active");
         document.getElementById("export").value = "export";
     } else {
-        document.getElementById("settingPanel").classList.add("active");
-        document.getElementById("settingPanel").classList.add("active");
+        settingsPanel.classList.add("active");
+        settingsPanel.classList.add("active");
         document.getElementById("export").value = "export";
     }
 };
 
 document.getElementById("iterScale").oninput = function update() {
+    disableAnimation();
     let scale = document.getElementById("iterScale");
     let value = scale.value;
     if (value == 0) {
@@ -546,6 +562,7 @@ for (let slider of sliders) {
         // Add our sliders to the variable data.
         element.oninput = function () {
             sketch.data[element.id] = element.value / element.max;
+            disableAnimation();
         };
 
         sketch.data[slider] = element.value / element.max;
@@ -553,14 +570,16 @@ for (let slider of sliders) {
 }
 sketch.data.iterScale = 1.0;
 
+let settingsPanel = document.getElementById("settingsPanel");
+
 
 let settings = document.getElementById("settings");
 if (!settings.classList.contains("vis")) {
     settings.classList.add("vis");
-    document.getElementById("settingPanel").classList.add("active");
+    settingsPanel.classList.add("active");
     setTimeout(function () {
         settings.classList.remove("vis");
-        document.getElementById("settingPanel").classList.remove("active");
+        settingsPanel.classList.remove("active");
     }, 2000);
 }
 
@@ -573,12 +592,37 @@ if (!(url.search === "")) {
     }
 }
 
+let sliderAnimation = {};
+
 // Random settings.
 function randomSliders() {
+    let temp = sketch.an;
     for (let slider of sliders) {
         let element = document.getElementById(slider);
+        sliderAnimation[slider] = {current : sketch.data[slider], target : null};
+        sliderAnimation[slider].target = Math.random() * element.max;
         element.value = Math.random() * element.max;
         element.oninput(element.value);
+    }
+    if (temp) {
+        animateSettings();
+    }
+}
+
+// Enables / Disables animations
+function animateSettings() {
+    if (!(settingsPanel.classList.contains("animation"))) {
+        settingsPanel.classList.add("animation");
+        sketch.an = true;
+    } else {
+        disableAnimation();
+    }
+}
+
+function disableAnimation() {
+    if (settingsPanel.classList.contains("animation")) {
+        settingsPanel.classList.remove("animation");
+        sketch.an = false;
     }
 }
 

@@ -93,24 +93,24 @@
     <div id="settingsHeader">
         settings
     </div>
-    <div id="settingPanel">
-         <label>
+    <div id="settingsPanel">
+         <label class="sliderLabel">
              color<BR>
         <input id="hue" type="range" min="1" max="500" value="250">
         </label>
-        <label>
+        <label class="sliderLabel">
              flux-capacitor<BR>
         <input id="modvar" type="range" min="1" max="1000" value="1000">
         </label>
-        <label>
+        <label class="sliderLabel">
              speed of light<BR>
         <input id="iterScale" type="range" min="0" max="3" value="0">
         </label>
-        <label>
+        <label class="sliderLabel">
              nuclear decay<BR>
         <input id="huemod" type="range" min="0" max="10000" value="0">
         </label>
-        <label>
+        <label class="sliderLabel">
                 wavelength<BR>
         <input id="wave" type="range" min="0" max="10000" value="0">
         </label>
@@ -119,6 +119,9 @@
         </label>
         <label id="export2">
             <input id="export" class="button" type="button" value="export" onclick="exportSettings(this)">
+        </label>
+        <label id="animate">
+            <input id="animateButton" class="button" type="button" value="animate" onclick="animateSettings(this)">
         </label>
     </div>
 </span>

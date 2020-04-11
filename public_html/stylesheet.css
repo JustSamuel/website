@@ -181,6 +181,7 @@ body {
 #settingsHeader {
     display: flex;
     padding: 5px;
+    color: #ffffff;
     background-color: var(--secondary-color);
     /*margin: 5px 5px 5px;*/
     align-content: center;
@@ -211,11 +212,11 @@ body {
 
 #settings:focus {
     visibility: visible;
-    opacity: 1;
+    opacity: 0.9;
     transition: opacity 0.3s, visibility 0.5s;
 }
 
-#settingPanel {
+#settingsPanel {
     display: flex;
     flex-direction: column;
     padding-left: 5px;
@@ -228,32 +229,39 @@ body {
     transition: all 0.3s ease;
 }
 
-#settingPanel.active {
+#settingsPanel.active {
     padding: 5px;
     max-height: 500px;
     visibility: visible;
     transition: all 0.3s ease;
 }
 
+#settingsPanel.animation .sliderLabel{
+    color: #ffffff;
+    opacity: 50%;
+}
+
 #settings.vis {
     visibility: visible!important;
-    opacity: 1!important;
+    opacity: 0.9!important;
     transition: opacity 0.3s, visibility 0.5s;
 }
 
 #settings:hover {
     visibility: visible;
-    opacity: 1;
+    opacity: 0.9;
     transition: opacity 0.3s ease, visibility ease 0.5s;
 }
 
 #settings label {
     margin: 5px;
+    transition: all 0.3s ease;
 }
 
 #settings .button {
     background-color: var(--secondary-color);
     border: none;
+    -webkit-appearance: none;
     color: #fff;
     padding: 5px;
     width: 100%;
