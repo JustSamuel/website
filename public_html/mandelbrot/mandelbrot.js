@@ -238,7 +238,7 @@ var mandelbrot = function () {
         if((timesince < 600) && (timesince > 0) && !this.mouseInfo.drag){
             // Create custom event to send to zoom handler.
             this.mouseInfo.event = {
-                deltaY : 1,
+                deltaY : -1,
                 offsetX : e.changedTouches[0].pageX,
                 offsetY : e.changedTouches[0].pageY,
             };
@@ -346,7 +346,7 @@ var mandelbrot = function () {
         // Zoom factor based on gaussian function.
         let zoom = 1 + gaussianFunction(this.steps, ZOOM_FACTOR, this.zoomSteps / 2, this.zoomSteps / 6);
         if (!(this.data.viewportWidth > 12 && this.mouseInfo.old.e.deltaY < 0)) {
-            if (scroll > 0 || scroll === undefined) {
+            if (scroll < 0 || scroll === undefined) {
                 // Zooming in.
                 this.data.viewportWidth = this.data.viewportWidth / zoom;
                 this.data.viewportHeight = this.data.viewportHeight / zoom;
