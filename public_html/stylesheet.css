@@ -195,7 +195,7 @@ body {
     top: 7vh;
     left: 7vh;
     visibility: visible;
-    opacity: 0.25;
+    opacity: 0.4;
     transition: opacity 0.3s, visibility 0.5s;
     cursor: move;
     z-index: 10;
@@ -265,4 +265,26 @@ body {
     color: #fff;
     padding: 5px;
     width: 100%;
+}
+
+#popup {
+    color: white;
+    background-color: var(--main-color);
+    padding: 10px;
+    opacity: 0;
+    text-align: center;
+    visibility: hidden;
+    border-radius: 10px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+}
+
+#popup.active {
+    opacity: 0.95;
+    visibility: visible;
+    transition: all 0.3s ease;
 }

@@ -572,7 +572,7 @@ sketch.data.iterScale = 1.0;
 
 let settingsPanel = document.getElementById("settingsPanel");
 
-
+// Makes the settings window popup for 2 seconds for clearity.
 let settings = document.getElementById("settings");
 if (!settings.classList.contains("vis")) {
     settings.classList.add("vis");
@@ -596,7 +596,6 @@ let sliderAnimation = {};
 
 // Random settings.
 function randomSliders() {
-    let temp = sketch.an;
     for (let slider of sliders) {
         let element = document.getElementById(slider);
         sliderAnimation[slider] = {current : sketch.data[slider], target : null};
@@ -604,14 +603,12 @@ function randomSliders() {
         element.value = Math.random() * element.max;
         element.oninput(element.value);
     }
-    if (temp) {
-        animateSettings();
-    }
 }
 
 // Enables / Disables animations
-function animateSettings() {
+function animateSettings(element) {
     if (!(settingsPanel.classList.contains("animation"))) {
+        element.value = "stop animation";
         settingsPanel.classList.add("animation");
         sketch.an = true;
     } else {
@@ -621,6 +618,7 @@ function animateSettings() {
 
 function disableAnimation() {
     if (settingsPanel.classList.contains("animation")) {
+        document.getElementById("animateButton").value = "start animation";
         settingsPanel.classList.remove("animation");
         sketch.an = false;
     }
@@ -628,11 +626,26 @@ function disableAnimation() {
 
 // Exports the settings to url.
 function exportSettings(element) {
-    element.value = "saved to url";
     let url ="?";
     // Creat query
     for (let data in sketch.data) {
         url += data + "=" + sketch.data[data] + "&";
     }
+    url = url.substring(0, url.length - 1);
+
+    let popup = document.getElementById("popup");
+    if (!(popup.classList.contains("active"))) {
+        popup.classList.add("active");
+        setTimeout(function () {
+            popup.classList.remove("active");
+        },2000);
+    }
+
+    // Copy to clipboard
+    var Url = document.createElement("textarea");
+    Url.innerHTML = window.location.href;
+    Url.select();
+    document.execCommand("copy");
+
     window.history.replaceState(sketch.data, "Mandelbrot", url);
 }
