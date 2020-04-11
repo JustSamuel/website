@@ -136,12 +136,14 @@ var mandelbrot = function () {
         this.gl.uniform1f(this.location, value);
     };
 
+    let x = 0;
+
     /**
      * General window animation frame.
      */
     this.animate = function () {
         window.requestAnimationFrame(this.animate.bind(this));
-        if (this.doZoom) this.zoomAnimation();
+        if (this.doZoom) {this.zoomAnimation()};
         this.updateValues();
     };
 
@@ -241,7 +243,7 @@ var mandelbrot = function () {
                 offsetY : e.changedTouches[0].pageY,
             };
 
-            // If we have double tapped, we do tripple tap zoomout.
+            // If we have double tapped, we do triple tap zoomout.
             if (this.mouseInfo.doubletap) {
                 clearTimeout(doubleTapTimeout);
                 this.mouseInfo.event.deltaY = -1;
@@ -422,12 +424,13 @@ document.getElementById("settingsHeader").onmousedown = function (e) {
 // Settings animation
 document.getElementById("settingsHeader").onclick = function(e) {
     if (e.pageX !== pressEvent.pageX || e.pageY !== pressEvent.pageY) return;
-    if (document.getElementById("settingsArrow").classList.contains("active")) {
-        document.getElementById("settingsArrow").classList.remove("active");
+    if (document.getElementById("settingPanel").classList.contains("active")) {
         document.getElementById("settingPanel").classList.remove("active");
+        document.getElementById("export").value = "export";
     } else {
-        document.getElementById("settingsArrow").classList.add("active");
         document.getElementById("settingPanel").classList.add("active");
+        document.getElementById("settingPanel").classList.add("active");
+        document.getElementById("export").value = "export";
     }
 };
 
@@ -550,6 +553,26 @@ for (let slider of sliders) {
 }
 sketch.data.iterScale = 1.0;
 
+
+let settings = document.getElementById("settings");
+if (!settings.classList.contains("vis")) {
+    settings.classList.add("vis");
+    document.getElementById("settingPanel").classList.add("active");
+    setTimeout(function () {
+        settings.classList.remove("vis");
+        document.getElementById("settingPanel").classList.remove("active");
+    }, 2000);
+}
+
+// Load the url query data
+let url = new URL(window.location.href);
+if (!(url.search === "")) {
+    for (let data in sketch.data) {
+        if (url.searchParams.get(data) === undefined) continue;
+        sketch.data[data] = Number(url.searchParams.get(data));
+    }
+}
+
 // Random settings.
 function randomSliders() {
     for (let slider of sliders) {
@@ -557,4 +580,15 @@ function randomSliders() {
         element.value = Math.random() * element.max;
         element.oninput(element.value);
     }
+}
+
+// Exports the settings to url.
+function exportSettings(element) {
+    element.value = "saved to url";
+    let url ="?";
+    // Creat query
+    for (let data in sketch.data) {
+        url += data + "=" + sketch.data[data] + "&";
+    }
+    window.history.replaceState(sketch.data, "Mandelbrot", url);
 }
