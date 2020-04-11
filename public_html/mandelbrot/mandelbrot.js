@@ -246,7 +246,7 @@ var mandelbrot = function () {
             // If we have double tapped, we do triple tap zoomout.
             if (this.mouseInfo.doubletap) {
                 clearTimeout(doubleTapTimeout);
-                this.mouseInfo.event.deltaY = -1;
+                this.mouseInfo.event.deltaY = 1;
                 this.zoom(this.mouseInfo.event);
                 this.mouseInfo.doubletap = false;
             } else {
