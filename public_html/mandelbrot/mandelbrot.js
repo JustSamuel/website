@@ -669,9 +669,11 @@ function exportSettings(element) {
 
     // Copy to clipboard
     var Url = document.getElementById("copy");
+    Url.setAttribute('style', 'display:visible;');
     Url.innerHTML = window.location.href;
     Url.focus();
     Url.select();
     settingsPanel.focus();
     document.execCommand("copy");
+    Url.setAttribute('style', 'display:none;');
 }
