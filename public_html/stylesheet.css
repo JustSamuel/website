@@ -283,6 +283,13 @@ body {
     transition: all 0.3s ease;
 }
 
+#copy {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: -99;
+}
+
 #popup.active {
     opacity: 0.95;
     visibility: visible;

@@ -29,8 +29,11 @@ var mandelbrot = function () {
     };
 
     // Hue animations.
+    this.sliderAnimationVars = {};
     this.an = false;
-    this.settingsAnimationSteps = 10;
+    this.settingsAnimationSteps = 25;
+    this.animationSteps = 0;
+    this.doSettingsAnimation = false;
 
     // Uniform locations of the variables.
     this.locations = {};
@@ -148,8 +151,27 @@ var mandelbrot = function () {
     this.animate = function () {
         window.requestAnimationFrame(this.animate.bind(this));
         if (this.doZoom) {this.zoomAnimation()};
+        this.sliderAnimation();
         this.hueAnimation();
         this.updateValues();
+    };
+
+    this.sliderAnimation = function () {
+        if (!this.doSettingsAnimation || this.sliderAnimationVars === undefined) return;
+        this.animationSteps++;
+        for (let slider of sliders) {
+            if (slider === "iterScale") continue;
+            let element = document.getElementById(slider);
+            if (element !== null) {
+                let temp = Number(element.value);
+                element.value = temp + this.sliderAnimationVars[slider]/this.settingsAnimationSteps;
+                element.oninput();
+            }
+        }
+        if (this.animationSteps >= this.settingsAnimationSteps) {
+            this.doSettingsAnimation = false;
+            this.animationSteps = 0;
+        }
     };
 
     /**
@@ -360,7 +382,7 @@ var mandelbrot = function () {
 
         // Zoom factor based on gaussian function.
         let zoom = 1 + gaussianFunction(this.steps, ZOOM_FACTOR, this.zoomSteps / 2, this.zoomSteps / 6);
-        if (!(this.data.viewportWidth > 12 && this.mouseInfo.old.e.deltaY < 0)) {
+        if (!(this.data.viewportWidth > 12 && this.mouseInfo.old.e.deltaY > 0)) {
             if (scroll < 0 || scroll === undefined) {
                 // Zooming in.
                 this.data.viewportWidth = this.data.viewportWidth / zoom;
@@ -592,16 +614,18 @@ if (!(url.search === "")) {
     }
 }
 
-let sliderAnimation = {};
-
 // Random settings.
 function randomSliders() {
+    sketch.doSettingsAnimation = true;
     for (let slider of sliders) {
         let element = document.getElementById(slider);
-        sliderAnimation[slider] = {current : sketch.data[slider], target : null};
-        sliderAnimation[slider].target = Math.random() * element.max;
-        element.value = Math.random() * element.max;
-        element.oninput(element.value);
+        if ((slider === "iterScale")) {
+            element.value = Math.random() * element.max;
+            element.oninput(element.value);
+        } else {
+            let change = Math.random()  * element.max - element.value;
+            sketch.sliderAnimationVars[slider] = change;
+        }
     }
 }
 
@@ -641,11 +665,13 @@ function exportSettings(element) {
         },2000);
     }
 
+    window.history.replaceState(sketch.data, "Mandelbrot", url);
+
     // Copy to clipboard
-    var Url = document.createElement("textarea");
+    var Url = document.getElementById("copy");
+    Url.focus();
     Url.innerHTML = window.location.href;
+    Url.focus();
     Url.select();
     document.execCommand("copy");
-
-    window.history.replaceState(sketch.data, "Mandelbrot", url);
 }
