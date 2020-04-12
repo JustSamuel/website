@@ -669,9 +669,9 @@ function exportSettings(element) {
 
     // Copy to clipboard
     var Url = document.getElementById("copy");
-    Url.focus();
     Url.innerHTML = window.location.href;
     Url.focus();
     Url.select();
+    settingsPanel.focus();
     document.execCommand("copy");
 }
