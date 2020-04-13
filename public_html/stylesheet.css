@@ -238,7 +238,21 @@ body {
 
 #settingsPanel.animation .sliderLabel{
     color: #ffffff;
-    opacity: 50%;
+    opacity: 40%;
+}
+
+#settingsPanel #zoombuttons {
+    color: greenyellow;
+    display: flex;
+    flex-direction: row;
+}
+
+#settingsPanel #zoombuttons .button {
+    margin-left: 10px;
+    margin-right: 10px;
+    display: inline;
+    color: #fff;
+    text-align: center;
 }
 
 #settings.vis {
@@ -265,6 +279,7 @@ body {
     color: #fff;
     padding: 5px;
     width: 100%;
+    font-size: 16px;
 }
 
 #popup {
@@ -293,5 +308,5 @@ body {
 #popup.active {
     opacity: 0.95;
     visibility: visible;
-    transition: all 0.3s ease;
+    transition: all 0.6s ease;
 }

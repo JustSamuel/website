@@ -434,6 +434,18 @@ var mandelbrot = function () {
         this.doZoom = true;
     };
 
+    /**
+     * Zoom in and out of the center screen.
+     */
+    this.zoomCenter = function (zoomIn) {
+        let e = {
+            deltaY: zoomIn ? -1 : 1,
+            offsetX: this.canvas.width / 2,
+            offsetY: this.canvas.height / 2
+        };
+        this.zoom(e);
+    };
+
 };
 
 /**
@@ -562,6 +574,7 @@ function dragElement(elmnt) {
         document.ontouchmove = null;
         document.ontouchcancel = null;
     }
+
 }
 
 // Used to determine if it is a fresh initialization.
@@ -594,7 +607,7 @@ sketch.data.iterScale = 1.0;
 
 let settingsPanel = document.getElementById("settingsPanel");
 
-// Makes the settings window popup for 2 seconds for clearity.
+// Makes the settings window popup for 2 seconds for clarity.
 let settings = document.getElementById("settings");
 if (!settings.classList.contains("vis")) {
     settings.classList.add("vis");
@@ -633,6 +646,7 @@ function randomSliders() {
 function animateSettings(element) {
     if (!(settingsPanel.classList.contains("animation"))) {
         element.value = "stop animation";
+        element.setAttribute('style', 'background-color:#3f839e');
         settingsPanel.classList.add("animation");
         sketch.an = true;
     } else {
@@ -643,6 +657,7 @@ function animateSettings(element) {
 function disableAnimation() {
     if (settingsPanel.classList.contains("animation")) {
         document.getElementById("animateButton").value = "start animation";
+        document.getElementById("animateButton").setAttribute('style', 'background-color:var(--secondary-color');
         settingsPanel.classList.remove("animation");
         sketch.an = false;
     }

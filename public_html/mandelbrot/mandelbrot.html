@@ -95,6 +95,10 @@
         settings
     </div>
     <div id="settingsPanel">
+        <label id="zoombuttons">
+            <input id="zoomIn" class="button" type="button" value="−" onclick="sketch.zoomCenter(false)">
+            <input id="zoomOut" class="button" type="button" value="+" onclick="sketch.zoomCenter(true)">
+        </label>
          <label class="sliderLabel">
              color<BR>
         <input id="hue" type="range" min="1" max="500" value="250">
@@ -115,10 +119,10 @@
                 wavelength<BR>
         <input id="wave" type="range" min="0" max="10000" value="0">
         </label>
-        <label id="button">
+        <label id="button" class="sliderLabel">
             <input class="button" type="button" value="random" onclick="randomSliders()">
         </label>
-        <label id="export2">
+        <label id="export2" class="sliderLabel">
             <input id="export" class="button" type="button" value="export" onclick="exportSettings(this)">
         </label>
         <label id="animate">
