@@ -441,7 +441,9 @@ var mandelbrot = function () {
         let e = {
             deltaY: zoomIn ? -1 : 1,
             offsetX: this.canvas.width / 2,
-            offsetY: this.canvas.height / 2
+            offsetY: this.canvas.height / 2,
+            clientX: this.canvas.width / 2,
+            clientY: this.canvas.height / 2,
         };
         this.zoom(e);
     };
