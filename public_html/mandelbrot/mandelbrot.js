@@ -647,7 +647,6 @@ function randomSliders() {
 function animateSettings(element) {
     if (!(settingsPanel.classList.contains("animation"))) {
         element.value = "stop animation";
-        element.setAttribute('style', 'background-color:#3f839e');
         settingsPanel.classList.add("animation");
         sketch.an = true;
     } else {
@@ -658,7 +657,6 @@ function animateSettings(element) {
 function disableAnimation() {
     if (settingsPanel.classList.contains("animation")) {
         document.getElementById("animateButton").value = "start animation";
-        document.getElementById("animateButton").setAttribute('style', 'background-color:var(--secondary-color');
         settingsPanel.classList.remove("animation");
         sketch.an = false;
     }
