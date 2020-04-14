@@ -1,5 +1,6 @@
 /**
  * General container for the mandelbrot set.
+ * TODO Implement perturbation theory
  */
 var mandelbrot = function () {
     // Canvas on which to draw.
@@ -382,27 +383,25 @@ var mandelbrot = function () {
 
         // Zoom factor based on gaussian function.
         let zoom = 1 + gaussianFunction(this.steps, ZOOM_FACTOR, this.zoomSteps / 2, this.zoomSteps / 6);
-        if (!(this.data.viewportWidth > 12 && this.mouseInfo.old.e.deltaY > 0)) {
-            if (scroll < 0 || scroll === undefined) {
-                // Zooming in.
-                this.data.viewportWidth = this.data.viewportWidth / zoom;
-                this.data.viewportHeight = this.data.viewportHeight / zoom;
+        if (scroll < 0 || scroll === undefined) {
+            // Zooming in.
+            this.data.viewportWidth = this.data.viewportWidth / zoom;
+            this.data.viewportHeight = this.data.viewportHeight / zoom;
 
-                deltaX = (mouse.x - this.data.minViewportX) * (1 - (1 / zoom));
-                deltaY = (mouse.y - this.data.minViewportY) * (1 - (1 / zoom));
-            } else {
-                // Zooming out
-                this.data.viewportWidth = this.data.viewportWidth * zoom;
-                this.data.viewportHeight = this.data.viewportHeight * zoom;
+            deltaX = (mouse.x - this.data.minViewportX) * (1 - (1 / zoom));
+            deltaY = (mouse.y - this.data.minViewportY) * (1 - (1 / zoom));
+        } else {
+            // Zooming out
+            this.data.viewportWidth = this.data.viewportWidth * zoom;
+            this.data.viewportHeight = this.data.viewportHeight * zoom;
 
-                deltaX = (mouse.x - this.data.minViewportX) * (1 - zoom);
-                deltaY = (mouse.y - this.data.minViewportY) * (1 - zoom);
-            }
-
-            // Apply translation
-            this.data.minViewportY += deltaY;
-            this.data.minViewportX += deltaX;
+            deltaX = (mouse.x - this.data.minViewportX) * (1 - zoom);
+            deltaY = (mouse.y - this.data.minViewportY) * (1 - zoom);
         }
+
+        // Apply translation
+        this.data.minViewportY += deltaY;
+        this.data.minViewportX += deltaX;
 
         // Animation control
         this.steps++;
