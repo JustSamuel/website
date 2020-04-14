@@ -12,7 +12,7 @@ var mandelbrot = function () {
     // Shader Program containing the mandelbrot set.
     this.shaderProgram = undefined;
 
-    this.iterations = 2000;
+    this.iterations = 1000;
 
     // All uniform variables used in the mandelbrot.
     // Variables must match their respective name in the webgl code.
