@@ -380,3 +380,126 @@ input[type=range]::-ms-track {
     border-width: 16px 0;
     color: transparent;
 }
+
+/* Tic Tac Toe */
+
+.center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+}
+
+#game {
+    min-width: 700px;
+    min-height: 700px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#cell {
+    min-width: 33%;
+    min-height: 33%;
+    border-width: 2px;
+    border-color: white;
+    padding: 0;
+    margin: -1px;
+    cursor: pointer;
+    transition: border ease 2s;
+}
+
+.top {
+    border-bottom: solid;
+}
+
+.mid {
+    border-top: solid;
+    border-bottom: solid;
+}
+
+.bottom {
+    border-top: solid;
+}
+
+.left {
+    border-right: solid;
+}
+
+.right {
+    border-left: solid;
+}
+
+.x:before{
+    margin-top: 5%;
+    margin-left: 15%;
+    position: absolute;
+    content: "";
+    border-radius: 5px;
+    border: 5px solid white;
+    display: block;
+    width: 0;
+    height: 19%;
+    transform: rotate(-45deg);
+    opacity: 1;
+}
+
+.x:after{
+    margin-top: 5%;
+    margin-left: 15%;
+    position: absolute;
+    content: "";
+    border-radius: 5px;
+    display: block;
+    border: 5px solid white;
+    width: 0;
+    height: 19%;
+    transform: rotate(45deg);
+    opacity: 1;
+}
+
+.o:before {
+    margin-top: 8%;
+    margin-left: 8%;
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    border: 10px solid;
+    display: block;
+    color: rgba(255, 255, 255, 1);
+    height: 12%;
+    width: 13%;
+    opacity: 1;
+}
+
+.o:after {
+    color: rgba(255, 255, 255, 1);
+}
+
+.tie {
+    transition: all ease 2s;
+}
+
+.tie:before {
+    transition: all ease 2s;
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.tie:after {
+    transition: all ease 2s;
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.lost {
+    transition: all ease 2s;
+}
+
+.lost:before {
+    transition: all ease 2s;
+   border-color: rgb(255, 0, 53);
+}
+
+.lost:after {
+    transition: all ease 2s;
+    border-color: rgb(255, 0, 53);
+}
