@@ -188,6 +188,10 @@ restart = function () {
 
 window.onload = function () {
     game = document.getElementById("game");
+
+    let min = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.8);
+    console.log(min);
+    game.setAttribute("style","width:" + min + "px;height:" + min + "px");
     let c = 0;
 
     // Create a div for each cell
