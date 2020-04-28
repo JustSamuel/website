@@ -3,21 +3,12 @@
  * Used in the Alpha Beta search.
  */
 class Board {
-    states = new Array(9).fill('empty');
-
-    xToMove = true;
-
-    humanIsX = true;
-
-    finished = false;
-
-    bestMove = undefined;
-
-    winner = undefined;
-
-    spacesLeft = 9;
-
     constructor(xToMove, humanIsX, states) {
+        this.states = new Array(9).fill('empty');
+        this.finished = false;
+        this.winner = undefined;
+        this.spacesLeft = 9;
+
         this.humanIsX = humanIsX;
         this.xToMove = xToMove;
         if (Array.isArray(states)) {
@@ -183,13 +174,11 @@ restart = function () {
     }
 };
 
-alert("test");
-
 window.onload = function () {
     board = new Board(true, true);
     game = document.getElementById("game");
 
-    let min = Math.floor(Math.min(window.outerHeight, window.outerWidth) * 0.8);
+    let min = Math.floor(Math.min(window.outerHeight, window.outerWidth) * 0.7);
     min = Math.max(100, min);
     game.setAttribute("style", "width:" + min + "px;height:" + min + "px");
     let c = 0;
@@ -201,7 +190,6 @@ window.onload = function () {
             div.id = "cell";
             div.classList.add(row);
             div.name = c;
-            alert(row + ", " + column);
             if (column !== "") div.classList.add(column);
             div.onclick = function () {
                 doMove(this.name);

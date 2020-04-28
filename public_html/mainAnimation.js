@@ -93,16 +93,17 @@ let CelAnimation = function (p) {
      */
     class cell {
 
-        CELL_SIZE = 10;         // Size of a single cell.
-        DRAG_FACTOR = 0.03;     // How viscous the water is.
-        MIN_SPEED = 0.05;       // Slowest a cell can move.
-        SPLIT_CHANCE = 0.0005;  // Chance every update that the cell will split.
-        AGING_SPEED = 0.003;    // How fast the cell dies of.
-        MAX_FERTILITY = 5*DEFAULT_FERTILITY;  // Max fertility of a cell.
-        MAX_DIST = 100;         // Distance before friends brake up.
-        MAX_FRIENDS = 10;
-
         constructor(location, speed, hue, fertility) {
+            this.CELL_SIZE = 10;         // Size of a single cell.
+            this.DRAG_FACTOR = 0.03;     // How viscous the water is.
+            this.MIN_SPEED = 0.05;       // Slowest a cell can move.
+            this.SPLIT_CHANCE = 0.0005;  // Chance every update that the cell will split.
+            this.AGING_SPEED = 0.003;    // How fast the cell dies of.
+            this.MAX_FERTILITY = 5*DEFAULT_FERTILITY;  // Max fertility of a cell.
+            this.MAX_DIST = 100;         // Distance before friends brake up.
+            this.MAX_FRIENDS = 10;
+
+
             // variables to describe the motion of the cell
             this.location = location.copy();
             this.speed = speed.copy();
