@@ -107,9 +107,8 @@ eval = function (board) {
     }
 };
 
-let board = new Board(true, true);
-let game = document.getElementById("game");
-let waiting = false;
+let board;
+let game;
 
 // Function that handles user input.
 doMove = function (i) {
@@ -187,6 +186,7 @@ restart = function () {
 };
 
 window.onload = function () {
+    board = new Board(true, true);
     game = document.getElementById("game");
     alert(game);
 
