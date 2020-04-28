@@ -201,6 +201,7 @@ window.onload = function () {
             div.id = "cell";
             div.classList.add(row);
             div.name = c;
+            alert(row + ", " + column);
             if (column !== "") div.classList.add(column);
             div.onclick = function () {
                 doMove(this.name);
