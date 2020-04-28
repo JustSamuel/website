@@ -399,8 +399,8 @@ input[type=range]::-ms-track {
 }
 
 #cell {
-    min-width: 33%;
-    min-height: 33%;
+    min-width: 33.3%;
+    min-height: 33.3%;
     border-width: 2px;
     border-color: white;
     padding: 0;
