@@ -188,6 +188,7 @@ restart = function () {
 
 window.onload = function () {
     game = document.getElementById("game");
+    alert(game);
 
     let min = Math.floor(Math.min(window.outerHeight, window.outerWidth) * 0.8);
     min = Math.max(100, min);
