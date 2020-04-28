@@ -148,7 +148,6 @@ doMove = function (i) {
 
 winAnimation = function () {
     if (board.getWinner() === undefined) {
-        console.log("tie game");
         Array.from(game.children).forEach(child =>{
             child.classList.add("tie");
         })
@@ -163,7 +162,6 @@ winAnimation = function () {
     }
     if (board.states[0] === board.states[4] && board.states[4] === board.states[8])[0,4,8].forEach(i=>{game.children[i].classList.add("lost")});
     if (board.states[2] === board.states[4] && board.states[4] === board.states[6])[2,4,6].forEach(i=>{game.children[i].classList.add("lost")});
-    console.log("over");
 };
 
 restart = function () {
@@ -185,10 +183,11 @@ restart = function () {
     }
 };
 
+alert("test");
+
 window.onload = function () {
     board = new Board(true, true);
     game = document.getElementById("game");
-    alert(game);
 
     let min = Math.floor(Math.min(window.outerHeight, window.outerWidth) * 0.8);
     min = Math.max(100, min);
