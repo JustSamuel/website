@@ -190,7 +190,7 @@ window.onload = function () {
     game = document.getElementById("game");
 
     let min = Math.floor(Math.min(window.outerHeight, window.outerWidth) * 0.8);
-    console.log(min);
+    min = Math.max(100, min);
     game.setAttribute("style", "width:" + min + "px;height:" + min + "px");
     let c = 0;
 
