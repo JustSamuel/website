@@ -5,16 +5,16 @@
 let CelAnimation = function (p) {
 
     // General animation speed.
-    let SPEED_FACTOR = 0.3;
+    p.SPEED_FACTOR = 0.3;
 
     // Range in which the colors spawn.
-    let COLOR_RANGE;
+    p.COLOR_RANGE;
 
-    // Default MAX_CELLS.
-    let MAX_CELLS = 400;
+    // Default p.MAX_CELLS.
+    p.MAX_CELLS = 400;
 
     // Basic fertility.
-    let DEFAULT_FERTILITY = 0.001;
+    p.DEFAULT_FERTILITY = 0.001;
 
     /**
      * Main p5.js setup
@@ -31,10 +31,10 @@ let CelAnimation = function (p) {
         p.handler = new cellHandler();
 
         // Range in which the cell colors are spawn.
-        COLOR_RANGE = p.random(100);
+        p.COLOR_RANGE = p.random(100);
 
         // Base maximum amount of cells on the size of the screen.
-        MAX_CELLS = (p.windowWidth * p.windowHeight) / 2000;
+        p.MAX_CELLS = (p.windowWidth * p.windowHeight) / 2000;
     };
 
     /**
@@ -42,13 +42,13 @@ let CelAnimation = function (p) {
      */
     p.draw = function () {
         // If there are few to no cells we create a new one with random genes.
-        if (p.handler.cells.length === 0 || (p.random(1) < (0.002*p.handler.cells.length)) && p.handler.cells.length < MAX_CELLS*0.1) {
-            p.handler.newCell(p.createVector(p.random(p.width),p.random(p.height)),p5.Vector.random2D(), p.random(100),DEFAULT_FERTILITY)
+        if (p.handler.cells.length === 0 || (p.random(1) < (0.002*p.handler.cells.length)) && p.handler.cells.length < p.MAX_CELLS*0.1) {
+            p.handler.newCell(p.createVector(p.random(p.width),p.random(p.height)),p5.Vector.random2D(), p.random(100),p.DEFAULT_FERTILITY)
         }
 
         // 0.01 chance to spawn a new cell if there is room.
-        if (p.random(1) < 0.01 && p.handler.cells.length < MAX_CELLS) {
-            p.handler.newCell(p.createVector(p.random(p.width),p.random(p.height)),p5.Vector.random2D(), p.random(100),DEFAULT_FERTILITY)
+        if (p.random(1) < 0.01 && p.handler.cells.length < p.MAX_CELLS) {
+            p.handler.newCell(p.createVector(p.random(p.width),p.random(p.height)),p5.Vector.random2D(), p.random(100),p.DEFAULT_FERTILITY)
         }
 
         // Clear and draw the cells.
@@ -84,7 +84,7 @@ let CelAnimation = function (p) {
         deviation = 20;
 
         newCell(location, speed, hue, fertility){
-            this.cells.push(new cell(location, speed, COLOR_RANGE + this.deviation - p.random(2*this.deviation) , fertility))
+            this.cells.push(new cell(location, speed, p.COLOR_RANGE + this.deviation - p.random(2*this.deviation) , fertility))
         }
     }
 
@@ -99,7 +99,7 @@ let CelAnimation = function (p) {
             this.MIN_SPEED = 0.05;       // Slowest a cell can move.
             this.SPLIT_CHANCE = 0.0005;  // Chance every update that the cell will split.
             this.AGING_SPEED = 0.003;    // How fast the cell dies of.
-            this.MAX_FERTILITY = 5*DEFAULT_FERTILITY;  // Max fertility of a cell.
+            this.MAX_FERTILITY = 5*p.DEFAULT_FERTILITY;  // Max fertility of a cell.
             this.MAX_DIST = 100;         // Distance before friends brake up.
             this.MAX_FRIENDS = 10;
 
@@ -240,7 +240,7 @@ let CelAnimation = function (p) {
          */
         split(){
             // Don't split if we have to many cells or this cell is infertile.
-            if (p.handler.cells.length > MAX_CELLS || !this.fertile) {
+            if (p.handler.cells.length > p.MAX_CELLS || !this.fertile) {
                 return;
             }
 
@@ -295,7 +295,7 @@ let CelAnimation = function (p) {
     // Spawn a cell on mouse location.
     p.mousePressed = function () {
         if (p.mouseButton === p.LEFT) {
-            let init_speed = p5.Vector.random2D().mult(SPEED_FACTOR);
+            let init_speed = p5.Vector.random2D().mult(p.SPEED_FACTOR);
             p.handler.newCell(p.createVector(p.mouseX, p.mouseY), init_speed, p.random(100), 0.002);
         }
     };
