@@ -482,12 +482,12 @@ input[type=range]::-ms-track {
 
 .tie:before {
     transition: all ease 2s;
-    border-color: rgba(255, 255, 255, 0.25);
+    border-color: rgb(86, 86, 86);
 }
 
 .tie:after {
     transition: all ease 2s;
-    border-color: rgba(255, 255, 255, 0.25);
+    border-color: rgb(86, 86, 86);
 }
 
 .lost {

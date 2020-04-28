@@ -1,3 +1,5 @@
+// TODO Rewrite / refactor code. We all know the first attempt aint the best one.
+// TODO Change styling to use a table or characters, more reliable across platforms.
 /**
  * Class containing all the information of the board.
  * Used in the Alpha Beta search.
@@ -86,10 +88,8 @@ alphabeta = function (board, alpha, beta) {
 
 // Evaluate the board.
 eval = function (board) {
-    // Without the depth bonus the AI would quit when he was about to lose.
-    let depthBonus = ((9 - board.spacesLeft) / 9);
     // Tie is in favor of the computer.
-    if (board.winner === undefined) return board.humanIsX ? -1.5 : 1.5;
+    if (board.winner === undefined) return 0;
     // Else check who won where the player winning is in favor of the computer.
     if (board.winner === "x") {
         return -1;
@@ -163,13 +163,12 @@ restart = function () {
     }
     if (!board.humanIsX) {
         setTimeout(function () {
-            alphabeta(board, -2, 2);
-            for (let j = 0; j < board.bestMove.states.length; j++) {
-                if (board.states[j] !== board.bestMove.states[j]) {
-                    game.children[j].classList.add(board.bestMove.states[j]);
-                }
-            }
-            board = board.bestMove;
+            let random = Math.floor(Math.random() * 9);
+            console.log(random);
+            board.states[random] = "x";
+            game.children[random].classList.add("x");
+            board.spacesLeft--;
+            board.xToMove = false;
         },10)
     }
 };
