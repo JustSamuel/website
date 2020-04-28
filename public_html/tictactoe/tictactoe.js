@@ -187,28 +187,26 @@ restart = function () {
 };
 
 window.onload = function () {
-    setTimeout(function () {
-        game = document.getElementById("game");
+    game = document.getElementById("game");
 
-        let min = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.8);
-        console.log(min);
-        game.setAttribute("style", "width:" + min + "px;height:" + min + "px");
-        let c = 0;
+    let min = Math.floor(Math.min(window.outerHeight, window.outerWidth) * 0.8);
+    console.log(min);
+    game.setAttribute("style", "width:" + min + "px;height:" + min + "px");
+    let c = 0;
 
-        // Create a div for each cell
-        ["top", "mid", "bottom"].forEach(row => {
-            ["left", "", "right"].forEach(column => {
-                let div = document.createElement("div");
-                div.id = "cell";
-                div.classList.add(row);
-                div.name = c;
-                if (column !== "") div.classList.add(column);
-                div.onclick = function () {
-                    doMove(this.name);
-                };
-                game.appendChild(div);
-                c++;
-            });
+    // Create a div for each cell
+    ["top", "mid", "bottom"].forEach(row => {
+        ["left", "", "right"].forEach(column => {
+            let div = document.createElement("div");
+            div.id = "cell";
+            div.classList.add(row);
+            div.name = c;
+            if (column !== "") div.classList.add(column);
+            div.onclick = function () {
+                doMove(this.name);
+            };
+            game.appendChild(div);
+            c++;
         });
-    }, 100);
+    });
 };

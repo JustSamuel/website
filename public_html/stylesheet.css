@@ -391,9 +391,8 @@ input[type=range]::-ms-track {
 }
 
 #game {
-    min-width: 10px;
-    min-height: 10px;
-    background-color: #04B1B1;
+    min-width: 100px;
+    min-height: 100px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -403,7 +402,7 @@ input[type=range]::-ms-track {
     min-width: 33%;
     min-height: 33%;
     border-width: 2px;
-    border-color: #0fff00;
+    border-color: white;
     padding: 0;
     margin: -1px;
     cursor: pointer;
