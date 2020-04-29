@@ -503,3 +503,13 @@ input[type=range]::-ms-track {
     transition: all ease 2s;
     border-color: rgb(255, 0, 53);
 }
+
+/* Ascii TV*/
+
+#tv {
+    background-color: white;
+}
+
+#source {
+    visibility: hidden;
+}
