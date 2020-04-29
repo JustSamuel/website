@@ -44,6 +44,17 @@ window.onload = function () {
     source = document.getElementById("source");
     canvas.width = source.clientWidth;
     canvas.height = source.clientHeight;
+    source.addEventListener("onplay", () => restartPlayer(),false);
+    source.addEventListener("play", () => restartPlayer(),false);
     asciiTV = new AsciiTV(source, canvas);
     asciiTV.greyscale();
+    setTimeout(function () {
+        source.play();
+    }, 100);
+};
+
+restartPlayer = function () {
+    asciiTV = new AsciiTV(source, canvas);
+    asciiTV.greyscale();
+    source.play();
 };
