@@ -521,8 +521,26 @@ input[type=range]::-ms-track {
 /* Minesweeper V2 */
 
 #game2 {
-    border-left: 5px solid rgb(130, 130, 130);
-    border-top: 5px solid rgb(130, 130, 130);
-    border-right: 5px solid white;
-    border-bottom: 5px solid white;
+    border-left: 13px solid rgb(130, 130, 130);
+    border-top: 13px solid rgb(130, 130, 130);
+    border-right: 13px solid white;
+    border-bottom: 13px solid white;
+}
+
+#settingsContainer {
+    z-index: -1;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+    border-left: 5px solid white;
+    border-top: 5px solid white;
+    background-color: rgb(192, 192, 192);
+    border-right: 5px solid rgb(130, 130, 130);
+    border-bottom: 5px solid rgb(130, 130, 130);
+    transition: opacity ease 1s;
+    opacity: 0;
+}
+
+#restart label {
+    text-align: center;
 }

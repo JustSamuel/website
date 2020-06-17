@@ -35,14 +35,27 @@ function GameEngine () {
    * Assigns default values.
    */
   this.default = function () {
+    if (this.settingsVisible) this.minefield[0][0].flip()
     this.livebombs = 0
     this.minefield = []
+    this.settingsVisible = false;
     this.firstClick = true
     this.cellcount = 0
     this.win = false
     this.lost = false
     game.width = document.body.clientWidth - 10
     game.height = document.body.clientHeight - 10
+  }
+
+  this.difficultyLookup = function (diff) {
+    switch (diff) {
+      case 'easy':
+        return 0.01
+      case 'medium':
+        return 0.1
+      case 'hard':
+        return 0.25
+    }
   }
 
   /**
@@ -74,7 +87,7 @@ function GameEngine () {
 
     this.minefield[0][0] = new SettingCell(0, 0, this.cellWidth, this)
     this.cellcount = c * r - 1
-    let bombCount = Math.floor(c * r * settings.difficulty)
+    let bombCount = Math.floor(c * r * this.difficultyLookup(settings.difficulty))
     this.livebombs = bombCount
     while (bombCount > 0) {
       let rC = Math.round(Math.random() * (c - 1))
@@ -116,11 +129,12 @@ function GameEngine () {
   }
 
   this.gameAnimation = function () {
+    if (!this.win) return
     requestAnimationFrame(this.gameAnimation.bind(this))
     this.minefield.forEach((array) => {
       array.forEach((cell) => {
         if (cell.surrounded !== 0) {
-          if (Math.random() > cell.surrounded / 10) cell.surrounded = ++cell.surrounded % 8
+          if (Math.random() > cell.surrounded / 10) cell.surrounded = ++cell.surrounded % 9
           cell.surrounded = Math.max(1, cell.surrounded)
         }
       })
@@ -320,7 +334,15 @@ function GameEngine () {
     }
 
     this.flip = function () {
-
+      if (gameEngine.settingsVisible) {
+        gameEngine.settingsVisible = false
+        document.getElementById('settingsContainer').style.opacity = '0'
+        document.getElementById('settingsContainer').style.zIndex = '-1'
+      } else {
+        gameEngine.settingsVisible = true
+        document.getElementById('settingsContainer').style.opacity = '1'
+        document.getElementById('settingsContainer').style.zIndex = '1'
+      }
     }
   }
 
@@ -332,8 +354,8 @@ const sprites = new Image()
 sprites.src = 'minesweeper-sprites.png'
 
 let defaultSettings = {
-  'difficulty': 0.01,
-  'cellWidth': 50
+  'difficulty': 'easy',
+  'cellWidth': 16
 }
 
 let gameEngine = new GameEngine()

@@ -17,6 +17,28 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <body oncontextmenu="return false;" onload="load()">
+<div id="settingsContainer" class="center">
+    <h1>SETTINGS</h1>
+    <div id="difficulty">
+        difficulty:
+        <label class="container">
+            <input type="radio" name="difficulty" id="easy" onclick="defaultSettings.difficulty = 'easy'">
+            <span class="checkmark">Easy</span>
+        </label>
+        <label class="container">
+            <input type="radio" name="difficulty" id="medium" onclick="defaultSettings.difficulty = 'medium'">
+            <span class="checkmark">Medium</span>
+        </label>
+        <label class="container">
+            <input type="radio" name="difficulty" id="hard" onclick="defaultSettings.difficulty = 'hard'">
+            <span class="checkmark">Hard</span>
+        </label>
+    </div>
+    <label id="restart" class="container">
+        <input type="radio" onclick="load()">
+        <span class="checkmark"><b>Restart</b></span>
+    </label>
+</div>
     <div id="gameContainer" class="center">
         <canvas id="game2"></canvas>
     </div>
