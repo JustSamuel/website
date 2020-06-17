@@ -232,7 +232,6 @@ var sketch = function (p) {
         // nill mine if out of bounds
         setNeighbour(i, cell) {
             this.neighbours[i] = cell;
-
         }
 
         flag() {
