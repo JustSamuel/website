@@ -20,6 +20,8 @@ function GameEngine () {
     let x = Math.floor(e.offsetX / this.cellWidth)
     let y = Math.floor(e.offsetY / this.cellWidth)
 
+    console.log(this.minefield[x][y])
+
     // Left vs Right click.
     if (e.button === 0) {
       this.minefield[x][y].flip()
@@ -56,6 +58,7 @@ function GameEngine () {
     this.cellcount = 0            // Together with livebombs forms the 'score' to determine when a game is done.
     this.win = false              // Boolean if the user has won.
     this.lost = false             // Boolean if the user has lost.
+    this.ai = true
 
     // Size game to document window.
     game.width = document.body.clientWidth - 10
@@ -142,6 +145,79 @@ function GameEngine () {
     load(this.settings)
   }
 
+  this.toFlag = []
+  this.toFlip = []
+
+  this.solverLoop = function () {
+    if (this.win || this.lost) return
+
+    requestAnimationFrame(this.solverLoop.bind(this))
+
+    if (this.toFlag.length === 0) {
+      this.findSuitable();
+    }
+
+    if (this.toFlag.length !== 0) {
+      let n = Math.floor(Math.random() * this.toFlag.length)
+      let cell = this.toFlag[n];
+      cell.flag()
+      this.toFlag.splice(n, 1)
+    } else if (this.toFlip.length !== 0) {
+      let n = Math.floor(Math.random() * this.toFlip.length)
+      let cell = this.toFlip[n];
+      cell.flip()
+      this.toFlip.splice(n, 1)
+    }
+
+
+    this.draw()
+  }
+
+  this.findSuitable = function () {
+    // Find flagable targets
+    this.minefield.forEach((array) => {
+      array.forEach((originCell) => {
+        if (!originCell.hidden && originCell.internalState !== 0) {
+          let a = 0
+          originCell.neighbours.forEach((cell) => {
+            if (cell.hidden && !cell.flagged && !(this.toFlag.indexOf(cell) > -1)) a++
+          })
+          if (a === originCell.internalState) {
+            originCell.neighbours.forEach((cell) => {
+              if (cell.hidden && !cell.flagged && !(this.toFlag.indexOf(cell) > -1)) {
+                const index = this.toFlag.indexOf(cell);
+                if (index < 0) {
+                  this.toFlag.push(cell)
+                }
+                cell.neighbours.forEach((cellInternal) => {
+                  if (cellInternal.internalState !== 0) {
+                    cellInternal.internalState--
+                  }
+                })
+              }
+            })
+          }
+        }
+      })
+    })
+
+    this.minefield.forEach((array) => {
+      array.forEach((cell) => {
+        if (cell.hidden && !cell.flagged && !(this.toFlag.indexOf(cell) > -1)) {
+          cell.neighbours.forEach((neighbour) => {
+            if (!neighbour.hidden && neighbour.internalState === 0) {
+              const index = this.toFlip.indexOf(cell);
+              if (index < 0) {
+                this.toFlip.push(cell)
+              }
+            }
+          })
+        }
+      })
+    })
+
+  }
+
   /**
    * Draws the current minefield situation to the canvas.
    */
@@ -210,6 +286,8 @@ function GameEngine () {
     this.posX = this.x * cellWidth
     this.posY = this.y * cellWidth
     this.cellWidth = cellWidth
+
+    this.internalState = 0
 
     // Initial values
     this.flagged = false
@@ -303,7 +381,10 @@ function GameEngine () {
    */
   Cell.prototype.setMine = function () {
     this.mine = true
-    this.neighbours.forEach((cell) => cell.surrounded++)
+    this.neighbours.forEach((cell) => {
+      cell.surrounded++
+      cell.internalState++
+    })
   }
 
   /**
