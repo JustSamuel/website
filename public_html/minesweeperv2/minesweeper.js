@@ -292,6 +292,9 @@ function GameEngine () {
    * TODO Fix getting stuck on 50/50 chances.
    */
   this.findSuitable = function () {
+    let deadlock
+    if (this.toFlip.size() === 0 && this.toFlag.size() === 0) deadlock = true
+
     // Find flayable targets
     this.minefield.forEach((array) => {
       array.forEach((originCell) => {
@@ -325,14 +328,32 @@ function GameEngine () {
         array.forEach((cell) => {
           if (cell.hidden && !cell.flagged && this.toFlag[cell.x + ", " +cell.y] === undefined) {
             cell.neighbours.forEach((neighbour) => {
-              if (neighbour.internalState === 0 && this.toFlip[cell.x + ", " + cell.y] === undefined) {
-                this.toFlip[cell.x + ", " + cell.y] = cell;
+              if ((neighbour.hidden && neighbour.flagged) || !neighbour.hidden) {
+                if (neighbour.internalState === 0 && this.toFlip[cell.x + ", " + cell.y] === undefined) {
+                  this.toFlip[cell.x + ", " + cell.y] = cell;
+                }
               }
             })
           }
         })
       })
     })
+    if (this.toFlip.size() === 0 && this.toFlag.size() === 0 && deadlock) this.getRandomHiddenCell()
+  }
+
+  /**
+   * Random cell to be used in deadlock situations.
+   */
+  this.getRandomHiddenCell = function () {
+    this.candidates = []
+    this.minefield.forEach((array) => {
+      array.forEach((cell) => {
+        if (cell.hidden && !cell.flagged) this.candidates.push(cell)
+      })
+    })
+    let target = this.candidates[[this.candidates.length * Math.random() | 0]]
+    console.log(this.target)
+    this.toFlip[target.x + ", " + target.y] = target
   }
 
   /**
