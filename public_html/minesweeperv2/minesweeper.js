@@ -20,8 +20,6 @@ function GameEngine () {
     let x = Math.floor(e.offsetX / this.cellWidth)
     let y = Math.floor(e.offsetY / this.cellWidth)
 
-    console.log(this.minefield[x][y])
-
     // Left vs Right click.
     if (e.button === 0) {
       this.minefield[x][y].flip()
@@ -145,77 +143,196 @@ function GameEngine () {
     load(this.settings)
   }
 
-  this.toFlag = []
-  this.toFlip = []
+  /**
+   * Used to animate the moving pointer for the solver.
+   */
+  this.mouse = {
+    x : document.body.offsetWidth / 2,
+    y : document.body.offsetHeight / 2,
+    stepCount : 5,
+    dx : 0,
+    dy : 0
+  }
 
+  /**
+   * Objects containing all the cells to be flagged and flipped by the pointer.
+   */
+  this.toFlag = {}
+  this.toFlip = {}
+
+  /**
+   * Returns the amount of keys in an object.
+   * @returns {number}
+   */
+  Object.prototype.size = function () {
+    return Object.keys(this).length;
+  }
+
+  /**
+   * Removes a cell from objects.
+   * @param cell
+   */
+  Object.prototype.remove = function (cell) {
+    this[cell.x + ',' + cell.y] = undefined
+  }
+
+  /**
+   * Grab a random key from the object.
+   */
+  Object.prototype.randomProperty = function () {
+    const keys = Object.keys(this);
+    return this[keys[keys.length * Math.random() | 0]];
+  }
+
+  /**
+   * Moves the pointer by the delta values.
+   */
+  this.moveMouse = function () {
+    this.mouse.x += this.mouse.dx
+    this.mouse.y += this.mouse.dy
+  }
+
+  /**
+   * Scales the dx and dy based on the position of the pointer and the target cell location.
+   */
+  this.setMouseTarget = function () {
+    this.mouse.dx = (this.target.cell.posX - this.mouse.x)
+    this.mouse.dy = (this.target.cell.posY - this.mouse.y)
+    let length = Math.sqrt(Math.pow(this.mouse.dx,2) + Math.pow(this.mouse.dy, 2)) / 100
+    this.mouse.dx = this.mouse.dx / length
+    this.mouse.dy = this.mouse.dy / length
+  }
+
+  /**
+   * Draws the pointer on top of the game.
+   */
+  this.drawMouse = function () {
+    gameContext.drawImage(pointer, 0, 0,
+      1602, 2400, this.mouse.x, this.mouse.y, this.cellWidth, (2400/1602)*this.cellWidth)
+  }
+
+  /**
+   * The next cell the pointer will interact  with.
+   */
+  this.target = {
+    cell : null,
+    flag : false
+  }
+
+  /**
+   * Main animation frame for the solver.
+   */
   this.solverLoop = function () {
+    // Stop of the game is over.
     if (this.win || this.lost) return
 
+    // Else use the animation timer
     requestAnimationFrame(this.solverLoop.bind(this))
 
-    if (this.toFlag.length === 0) {
+    // If there is nothing to flip we rescan the board.
+    if (this.toFlip.size() === 0) {
       this.findSuitable();
     }
 
-    if (this.toFlag.length !== 0) {
-      let n = Math.floor(Math.random() * this.toFlag.length)
-      let cell = this.toFlag[n];
-      cell.flag()
-      this.toFlag.splice(n, 1)
-    } else if (this.toFlip.length !== 0) {
-      let n = Math.floor(Math.random() * this.toFlip.length)
-      let cell = this.toFlip[n];
-      cell.flip()
-      this.toFlip.splice(n, 1)
+    // Grab a new target if the current is finished.
+    if (this.target.cell === null) {
+
+      // We prioritize flagging over flipping
+      if (this.toFlag.size() !== 0) {
+
+        // Grab a random cell from the object
+        let cell = this.toFlag.randomProperty();
+
+        // Make it a target
+        this.target.cell = cell
+        this.target.flag = true
+
+        // Remove it from the list
+        delete this.toFlag[cell.x + ', ' + cell.y];
+
+      } else if (this.toFlip.size() !== 0) {
+        // Idem dito
+        let cell = this.toFlip.randomProperty();
+
+        this.target.cell = cell
+        this.target.flag = false
+
+        delete this.toFlip[cell.x + ', ' + cell.y];
+      }
+      // If we have a new target we update the poitner.
+      if (this.target.cell !== null) this.setMouseTarget()
+    } else {
+      // If pointer is on cell, do action, else move pointer.
+      if ((this.mouse.x - 5 * this.cellWidth < this.target.cell.posX &&
+        this.target.cell.posX < this.mouse.x + 5 * this.cellWidth &&
+        this.mouse.y - 5 * this.cellWidth < this.target.cell.posY &&
+        this.target.cell.posY < this.mouse.y + 5 * this.cellWidth)) {
+
+        // Check if we should flip or flag.
+        if (this.target.flag) {
+          this.target.cell.flag()
+        } else {
+          this.target.cell.flip()
+        }
+
+        // Target has been processed.
+        this.target.cell = null
+
+      } else {
+        this.moveMouse()
+      }
     }
 
-
     this.draw()
+    this.drawMouse()
   }
 
+  /**
+   * Function that fills the toFlip and toFlag arrays.
+   * TODO Fix getting stuck on 50/50 chances.
+   */
   this.findSuitable = function () {
-    // Find flagable targets
+    // Find flayable targets
     this.minefield.forEach((array) => {
       array.forEach((originCell) => {
+        // Go over each cell
+
+        // Basic flagging logic, keep an internal state for the found cells.
         if (!originCell.hidden && originCell.internalState !== 0) {
-          let a = 0
-          originCell.neighbours.forEach((cell) => {
-            if (cell.hidden && !cell.flagged && !(this.toFlag.indexOf(cell) > -1)) a++
-          })
-          if (a === originCell.internalState) {
+          if (!originCell.hidden && originCell.internalState !== 0) {
+            let a = 0
             originCell.neighbours.forEach((cell) => {
-              if (cell.hidden && !cell.flagged && !(this.toFlag.indexOf(cell) > -1)) {
-                const index = this.toFlag.indexOf(cell);
-                if (index < 0) {
-                  this.toFlag.push(cell)
-                }
-                cell.neighbours.forEach((cellInternal) => {
-                  if (cellInternal.internalState !== 0) {
-                    cellInternal.internalState--
-                  }
-                })
-              }
+              if (cell.hidden && !cell.flagged && this.toFlag[cell.x + ", " + cell.y] === undefined) a++
             })
+            if (a === originCell.internalState) {
+              originCell.neighbours.forEach((cell) => {
+                if (cell.hidden && !cell.flagged && this.toFlag[cell.x + ", " + cell.y] === undefined) {
+                  this.toFlag[cell.x + ", " + cell.y] = cell;
+                  cell.neighbours.forEach((cellInternal) => {
+                    if (cellInternal.internalState !== 0) {
+                      cellInternal.internalState--
+                    }
+                  })
+                }
+              })
+            }
           }
         }
       })
-    })
 
-    this.minefield.forEach((array) => {
-      array.forEach((cell) => {
-        if (cell.hidden && !cell.flagged && !(this.toFlag.indexOf(cell) > -1)) {
-          cell.neighbours.forEach((neighbour) => {
-            if (!neighbour.hidden && neighbour.internalState === 0) {
-              const index = this.toFlip.indexOf(cell);
-              if (index < 0) {
-                this.toFlip.push(cell)
+      // Check if the internal state is 0 meaning that it is a dull.
+      this.minefield.forEach((array) => {
+        array.forEach((cell) => {
+          if (cell.hidden && !cell.flagged && this.toFlag[cell.x + ", " +cell.y] === undefined) {
+            cell.neighbours.forEach((neighbour) => {
+              if (neighbour.internalState === 0 && this.toFlip[cell.x + ", " + cell.y] === undefined) {
+                this.toFlip[cell.x + ", " + cell.y] = cell;
               }
-            }
-          })
-        }
+            })
+          }
+        })
       })
     })
-
   }
 
   /**
@@ -556,6 +673,8 @@ function GameEngine () {
 // Load sprites
 const sprites = new Image()
 sprites.src = 'minesweeper-sprites.png'
+const pointer = new Image()
+pointer.src = 'mouse.png'
 
 // Start on medium
 let defaultSettings = {
